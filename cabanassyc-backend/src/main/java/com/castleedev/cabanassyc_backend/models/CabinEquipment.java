@@ -1,4 +1,4 @@
-package com.castleedev.cabanassyc_backend.models;
+package com.castleedev.cabanassyc_backend.Models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
