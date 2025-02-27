@@ -56,8 +56,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.5</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -70,6 +71,14 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.36</version>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

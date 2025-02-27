@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CabanassycBackendApplication<cabanassyc-backend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.castleedev.cabanassyc_backend.CabanassycBackendApplication",
+            "projectName": "cabanassyc-backend",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
