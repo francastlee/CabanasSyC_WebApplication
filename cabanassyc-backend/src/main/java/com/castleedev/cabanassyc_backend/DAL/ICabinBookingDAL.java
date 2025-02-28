@@ -20,6 +20,6 @@ public interface ICabinBookingDAL extends JpaRepository<CabinBooking, Long> {
     @Query("UPDATE CabinBooking c SET c.state = false WHERE c.cabinBookingId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    CabinBooking findByIdByStateTrue(Long id);
+    CabinBooking findByIdAndStateTrue(Long id);
 
 }

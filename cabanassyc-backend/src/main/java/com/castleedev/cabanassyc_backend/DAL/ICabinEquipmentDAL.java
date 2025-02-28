@@ -20,6 +20,6 @@ public interface ICabinEquipmentDAL extends JpaRepository<CabinEquipment, Long> 
     @Query("UPDATE CabinEquipment c SET c.state = false WHERE c.cabinEquipmentId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    CabinEquipment findByIdByStateTrue(Long id);
+    CabinEquipment findByIdAndStateTrue(Long id);
 
 }

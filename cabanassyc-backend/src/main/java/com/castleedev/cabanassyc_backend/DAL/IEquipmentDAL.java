@@ -20,6 +20,6 @@ public interface IEquipmentDAL extends JpaRepository<Equipment, Long> {
     @Query("UPDATE Equipment c SET c.state = false WHERE c.equipmentId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    Equipment findByIdByStateTrue(Long id);
+    Equipment findByIdAndStateTrue(Long id);
 
 }

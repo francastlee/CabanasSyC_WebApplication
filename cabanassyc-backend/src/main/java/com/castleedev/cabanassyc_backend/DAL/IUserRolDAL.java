@@ -20,6 +20,6 @@ public interface IUserRolDAL extends JpaRepository<UserRol, Long> {
     @Query("UPDATE UserRol c SET c.state = false WHERE c.userRolId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    UserRol findByIdByStateTrue(Long id);
+    UserRol findByIdAndStateTrue(Long id);
 
 }
