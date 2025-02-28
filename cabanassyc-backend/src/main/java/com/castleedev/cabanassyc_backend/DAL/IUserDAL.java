@@ -20,6 +20,6 @@ public interface IUserDAL extends JpaRepository<User, Long> {
     @Query("UPDATE User c SET c.state = false WHERE c.userId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    User findByIdByStateTrue(Long id);
+    User findByIdAndStateTrue(Long id);
 
 }

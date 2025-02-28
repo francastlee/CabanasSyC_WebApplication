@@ -20,6 +20,6 @@ public interface IMaterialDAL extends JpaRepository<Material, Long> {
     @Query("UPDATE Material c SET c.state = false WHERE c.materialId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    Material findByIdByStateTrue(Long id);
+    Material findByIdAndStateTrue(Long id);
 
 }

@@ -20,6 +20,6 @@ public interface IRolDAL extends JpaRepository<Rol, Long> {
     @Query("UPDATE Rol c SET c.state = false WHERE c.rolId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    Rol findByIdByStateTrue(Long id);
+    Rol findByIdAndStateTrue(Long id);
 
 }

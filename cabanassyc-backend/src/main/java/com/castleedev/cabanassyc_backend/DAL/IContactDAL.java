@@ -20,6 +20,6 @@ public interface IContactDAL extends JpaRepository<Contact, Long> {
     @Query("UPDATE Contact c SET c.state = false WHERE c.contactId = :id")
     boolean softDeleteById(@Param("id") Long id);
 
-    Contact findByIdByStateTrue(Long id);
+    Contact findByIdAndStateTrue(Long id);
 
 }
