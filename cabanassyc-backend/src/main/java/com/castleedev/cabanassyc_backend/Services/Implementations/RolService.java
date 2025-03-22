@@ -6,48 +6,73 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.castleedev.cabanassyc_backend.DAL.IRolDAL;
+import com.castleedev.cabanassyc_backend.DTO.RolDTO;
 import com.castleedev.cabanassyc_backend.Models.Rol;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IRolService;
-
+import java.util.ArrayList;
 @Service
 public class RolService implements IRolService {
     
     @Autowired
     private IRolDAL rolDAL;
 
+    RolDTO convertir (Rol rol) {
+        return new RolDTO(
+            rol.getId(), 
+            rol.getName(), 
+            rol.isState()
+        );
+    }
+
+    Rol convertir (RolDTO rolDTO) {
+        return new Rol(
+            rolDTO.getId(), 
+            rolDTO.getName(), 
+            rolDTO.isState()
+        );
+    }
+
     @Override
-    public List<Rol> getAllRoles() {
+    public List<RolDTO> getAllRoles() {
         try {
-            return rolDAL.findAllByStateTrue();
+            List<Rol> rols = rolDAL.findAllByStateTrue();
+            List<RolDTO> rolsDTO = new ArrayList<RolDTO>();
+            for (Rol rol : rols) {
+                rolsDTO.add(convertir(rol));
+            }
+            return rolsDTO;
         } catch (Exception e) {
             throw new RuntimeException("Error getting all roles", e);
         }
     }
 
-    @Override
-    public Rol getRolById(Long id) {
+    @Override  
+    public RolDTO getRolById(Long id) {
         try {
-            return rolDAL.findByIdAndStateTrue(id);
+            Rol rol = rolDAL.findByIdAndStateTrue(id);
+            return convertir(rol);
         } catch (Exception e) {
             throw new RuntimeException("Error getting a role", e);
         }
     }
 
     @Override
-    public Rol addRol(Rol rol) {
+    public RolDTO addRol(RolDTO rolDTO) {
         try {
-            return rolDAL.save(rol);
+            Rol rol = convertir(rolDTO);
+            return convertir(rolDAL.save(rol));
         } catch (Exception e) {
             throw new RuntimeException("Error adding a role", e);
         }
     }
 
     @Override
-    public Rol updateRol(Rol rol) {
+    public RolDTO updateRol(RolDTO rolDTO) {
         try {
-            return rolDAL.save(rol);
+            Rol rol = convertir(rolDTO);
+            return convertir(rolDAL.save(rol));
         } catch (Exception e) {
-            throw new RuntimeException("Error updating a role", e);
+            throw new RuntimeException("Error updating a role: " + e.getMessage());
         }
     }
 

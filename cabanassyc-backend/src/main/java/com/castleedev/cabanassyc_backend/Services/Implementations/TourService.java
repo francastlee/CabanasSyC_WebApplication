@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.castleedev.cabanassyc_backend.DAL.ITourDAL;
+import com.castleedev.cabanassyc_backend.DTO.TourDTO;
 import com.castleedev.cabanassyc_backend.Models.Tour;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ITourService;
+import java.util.ArrayList;
 
 @Service
 public class TourService implements ITourService{
@@ -15,37 +17,69 @@ public class TourService implements ITourService{
     @Autowired
     private ITourDAL tourDAL;
 
+    TourDTO convertir (Tour tour) {
+        return new TourDTO(
+            tour.getId(), 
+            tour.getName(), 
+            tour.getCapacity(), 
+            tour.getPrice(), 
+            tour.getStartTime(), 
+            tour.getEndTime(), 
+            tour.isState()
+        );
+    }
+
+    Tour convertir (TourDTO tourDTO) {
+        return new Tour(
+            tourDTO.getId(), 
+            tourDTO.getName(), 
+            tourDTO.getCapacity(), 
+            tourDTO.getPrice(), 
+            tourDTO.getStartTime(), 
+            tourDTO.getEndTime(), 
+            tourDTO.isState()
+        );
+    }
+
     @Override
-    public List<Tour> getAllTours() {
+    public List<TourDTO> getAllTours() {
         try {
-            return tourDAL.findAllByStateTrue();
+            List<Tour> tours = tourDAL.findAllByStateTrue();
+            List<TourDTO> toursDTO = new ArrayList<TourDTO>();
+            for (Tour tour : tours) {
+                toursDTO.add(convertir(tour));
+            }
+            return toursDTO;
         } catch (Exception e) {
-            throw new RuntimeException("Error getting all tours", e);
+            throw new RuntimeException("Error getting all tours: " + e.getMessage());
         }
     }
 
     @Override
-    public Tour getTourById(Long id) {
+    public TourDTO getTourById(Long id) {
         try {
-            return tourDAL.findByIdAndStateTrue(id);
+            Tour tour = tourDAL.findByIdAndStateTrue(id);
+            return convertir(tour);
         } catch (Exception e) {
             throw new RuntimeException("Error getting tour by id", e);
         }
     }
 
     @Override
-    public Tour addTour(Tour tour) {
+    public TourDTO addTour(TourDTO tourDTO) {
         try {
-            return tourDAL.save(tour);
+            Tour tour = convertir(tourDTO);
+            return convertir(tourDAL.save(tour));
         } catch (Exception e) {
             throw new RuntimeException("Error adding tour", e);
         }
     }
 
     @Override
-    public Tour updateTour(Tour tour) {
+    public TourDTO updateTour(TourDTO tourDTO) {
         try {
-            return tourDAL.save(tour);
+            Tour tour = convertir(tourDTO);
+            return convertir(tourDAL.save(tour));
         } catch (Exception e) {
             throw new RuntimeException("Error updating tour", e);
         }

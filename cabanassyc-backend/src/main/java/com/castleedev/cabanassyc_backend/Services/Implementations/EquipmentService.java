@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.castleedev.cabanassyc_backend.DAL.IEquipmentDAL;
+import com.castleedev.cabanassyc_backend.DTO.EquipmentDTO;
 import com.castleedev.cabanassyc_backend.Models.Equipment;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IEquipmentService;
+import java.util.ArrayList;
 
 @Service
 public class EquipmentService implements IEquipmentService {
@@ -15,37 +17,61 @@ public class EquipmentService implements IEquipmentService {
     @Autowired
     private IEquipmentDAL equipmentDAL;
 
+    EquipmentDTO convertir (Equipment equipment) {
+        return new EquipmentDTO(
+            equipment.getId(), 
+            equipment.getName(), 
+            equipment.isState()
+        );
+    }
+
+    Equipment convertir (EquipmentDTO equipmentDTO) {
+        return new Equipment(
+            equipmentDTO.getId(), 
+            equipmentDTO.getName(), 
+            equipmentDTO.isState()
+        );
+    }
+
     @Override
-    public List<Equipment> getAllEquipments() {
+    public List<EquipmentDTO> getAllEquipments() {
         try {
-            return equipmentDAL.findAllByStateTrue();
+            List<Equipment> equipmentList = equipmentDAL.findAllByStateTrue();
+            List<EquipmentDTO> equipmentDTOList = new ArrayList<EquipmentDTO>();
+            for (Equipment equipment : equipmentList) {
+                equipmentDTOList.add(convertir(equipment));
+            }
+            return equipmentDTOList;
         } catch (Exception e) {
             throw new RuntimeException("Error getting all equipments", e);
         }
     }
 
     @Override
-    public Equipment getEquipmentById(Long id) {
+    public EquipmentDTO getEquipmentById(Long id) {
         try {
-            return equipmentDAL.findByIdAndStateTrue(id);
+            Equipment equipment = equipmentDAL.findByIdAndStateTrue(id);
+            return convertir(equipment);
         } catch (Exception e) {
             throw new RuntimeException("Error getting an equipment", e);
         }
     }
 
     @Override
-    public Equipment addEquipment(Equipment equipment) {
+    public EquipmentDTO addEquipment(EquipmentDTO equipmentDTO) {
         try {
-            return equipmentDAL.save(equipment);
+            Equipment equipment = convertir(equipmentDTO);
+            return convertir(equipmentDAL.save(equipment));
         } catch (Exception e) {
             throw new RuntimeException("Error adding an equipment", e);
         }
     }
 
     @Override
-    public Equipment updateEquipment(Equipment equipment) {
+    public EquipmentDTO updateEquipment(EquipmentDTO equipmentDTO) {
         try {
-            return equipmentDAL.save(equipment);
+            Equipment equipment = convertir(equipmentDTO);
+            return convertir(equipmentDAL.save(equipment));
         } catch (Exception e) {
             throw new RuntimeException("Error updating an equipment", e);
         }

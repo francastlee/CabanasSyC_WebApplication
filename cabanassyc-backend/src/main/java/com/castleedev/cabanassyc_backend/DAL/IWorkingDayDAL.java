@@ -17,8 +17,8 @@ public interface IWorkingDayDAL extends JpaRepository<WorkingDay, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE WorkingDay c SET c.state = false WHERE c.workingDayId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE WorkingDay c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     WorkingDay findByIdAndStateTrue(Long id);
 

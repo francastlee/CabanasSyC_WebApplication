@@ -11,17 +11,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "cabin")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Cabin {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cabinId")
-    private Long cabinId;
+    private Long id;
 
     private String name;
 
@@ -36,4 +40,12 @@ public class Cabin {
 
     @OneToMany(mappedBy = "cabin")
     private List<CabinBooking> cabinBookingList;
+
+    public Cabin(Long id, String name, CabinType cabinType, boolean state) {
+        this.id = id;
+        this.name = name;
+        this.cabinType = cabinType;
+        this.state = state;
+    }
+
 }

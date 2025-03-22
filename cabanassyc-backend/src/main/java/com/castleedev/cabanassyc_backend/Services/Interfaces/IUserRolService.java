@@ -2,14 +2,14 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.UserRol;
+import com.castleedev.cabanassyc_backend.DTO.UserRolDTO;
 
 public interface IUserRolService {
     
-    public List<UserRol> getAllUserRoles();
-    public UserRol getUserRolById(Long id);
-    public UserRol addUserRol(UserRol userRol);
-    public UserRol updateUserRol(UserRol userRol);
+    public List<UserRolDTO> getAllUserRoles();
+    public UserRolDTO getUserRolById(Long id);
+    public UserRolDTO addUserRol(UserRolDTO userRolDTO);
+    public UserRolDTO updateUserRol(UserRolDTO userRolDTO);
     public void deleteUserRol(Long id);
     
 }

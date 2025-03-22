@@ -1,7 +1,6 @@
 package com.castleedev.cabanassyc_backend.DAL;
 
 import com.castleedev.cabanassyc_backend.Models.CabinType;
-
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -17,8 +16,8 @@ public interface ICabinTypeDAL extends JpaRepository<CabinType, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE CabinType c SET c.state = false WHERE c.cabinTypeId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE CabinType c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     CabinType findByIdAndStateTrue(Long id);
 

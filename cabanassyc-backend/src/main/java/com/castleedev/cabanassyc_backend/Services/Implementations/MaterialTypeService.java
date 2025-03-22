@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.castleedev.cabanassyc_backend.DAL.IMaterialTypeDAL;
+import com.castleedev.cabanassyc_backend.DTO.MaterialTypeDTO;
 import com.castleedev.cabanassyc_backend.Models.MaterialType;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IMaterialTypeService;
+import java.util.ArrayList;
 
 @Service
 public class MaterialTypeService implements IMaterialTypeService{
@@ -15,37 +17,61 @@ public class MaterialTypeService implements IMaterialTypeService{
     @Autowired
     private IMaterialTypeDAL materialTypeDAL;
 
+    MaterialTypeDTO convertir (MaterialType materialType){
+        return new MaterialTypeDTO(
+            materialType.getId(), 
+            materialType.getName(), 
+            materialType.isState()
+        );
+    }
+
+    MaterialType convertir (MaterialTypeDTO materialTypeDTO){
+        return new MaterialType(
+            materialTypeDTO.getId(), 
+            materialTypeDTO.getName(), 
+            materialTypeDTO.isState()
+        );
+    }
+
     @Override
-    public List<MaterialType> getAllMaterialTypes() {
+    public List<MaterialTypeDTO> getAllMaterialTypes() {
         try {
-            return materialTypeDAL.findAllByStateTrue();
+            List<MaterialType> materialTypes = materialTypeDAL.findAllByStateTrue();
+            List<MaterialTypeDTO> materialTypesDTO = new ArrayList<>();
+            for (MaterialType materialType : materialTypes) {
+                materialTypesDTO.add(convertir(materialType));
+            }
+            return materialTypesDTO;
         } catch (Exception e) {
             throw new RuntimeException("Error getting all materials", e);
         }
     }
 
     @Override
-    public MaterialType getMaterialTypeById(Long id) {
+    public MaterialTypeDTO getMaterialTypeById(Long id) {
         try {
-            return materialTypeDAL.findByIdAndStateTrue(id);
+            MaterialType materialType = materialTypeDAL.findByIdAndStateTrue(id);
+            return convertir(materialType);
         } catch (Exception e) {
             throw new RuntimeException("Error getting a material", e);
         }
     }
 
     @Override
-    public MaterialType addMaterialType(MaterialType materialType) {
+    public MaterialTypeDTO addMaterialType(MaterialTypeDTO materialTypeDTO) {
         try {
-            return materialTypeDAL.save(materialType);
+            MaterialType materialType = convertir(materialTypeDTO);
+            return convertir(materialTypeDAL.save(materialType));
         } catch (Exception e) {
             throw new RuntimeException("Error adding a material", e);
         }
     }
 
     @Override
-    public MaterialType updateMaterialType(MaterialType materialType) {
+    public MaterialTypeDTO updateMaterialType(MaterialTypeDTO materialTypeDTO) {
         try {
-            return materialTypeDAL.save(materialType);
+            MaterialType materialType = convertir(materialTypeDTO);
+            return convertir(materialTypeDAL.save(materialType));
         } catch (Exception e) {
             throw new RuntimeException("Error updating a material", e);
         }

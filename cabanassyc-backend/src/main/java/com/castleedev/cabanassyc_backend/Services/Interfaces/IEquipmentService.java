@@ -2,14 +2,14 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.Equipment;
+import com.castleedev.cabanassyc_backend.DTO.EquipmentDTO;
 
 public interface IEquipmentService {
 
-    public List<Equipment> getAllEquipments();
-    public Equipment getEquipmentById(Long id);
-    public Equipment addEquipment(Equipment equipment);
-    public Equipment updateEquipment(Equipment equipment);
+    public List<EquipmentDTO> getAllEquipments();
+    public EquipmentDTO getEquipmentById(Long id);
+    public EquipmentDTO addEquipment(EquipmentDTO equipmentDTO);
+    public EquipmentDTO updateEquipment(EquipmentDTO equipmentDTO);
     public void deleteEquipment(Long id);
     
 }
