@@ -17,8 +17,8 @@ public interface IMaterialTypeDAL extends JpaRepository<MaterialType, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE MaterialType c SET c.state = false WHERE c.materialTypeId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE MaterialType c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     MaterialType findByIdAndStateTrue(Long id);
 

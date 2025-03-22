@@ -5,8 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.castleedev.cabanassyc_backend.DAL.ICabinDAL;
+import com.castleedev.cabanassyc_backend.DAL.ICabinTypeDAL;
+import com.castleedev.cabanassyc_backend.DTO.CabinDTO;
 import com.castleedev.cabanassyc_backend.Models.Cabin;
+import com.castleedev.cabanassyc_backend.Models.CabinType;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ICabinService;
+import java.util.ArrayList;
 
 @Service
 public class CabinService implements ICabinService {
@@ -14,37 +18,73 @@ public class CabinService implements ICabinService {
     @Autowired
     private ICabinDAL cabinDAL;
 
+    @Autowired
+    private ICabinTypeDAL cabinTypeDAL;
+
+
+    CabinDTO convertir (Cabin cabin) {
+        CabinDTO cabinDTO = new CabinDTO (
+            cabin.getId(),
+            cabin.getName(),
+            cabin.getCabinType().getId(),
+            cabin.isState()
+        );
+        return cabinDTO;
+    }
+
+    Cabin convertir (CabinDTO cabinDTO) {
+        CabinType cabinType = cabinTypeDAL.findByIdAndStateTrue(cabinDTO.getCabinTypeId());
+        if (cabinType == null) {
+            throw new RuntimeException("Cabin type not found");
+        }
+        Cabin cabin = new Cabin (
+            cabinDTO.getId(),
+            cabinDTO.getName(),
+            cabinType,
+            cabinDTO.isState()
+        );
+        return cabin;
+    }
+
     @Override
-    public List<Cabin> getAllCabins() {
+    public List<CabinDTO> getAllCabins() {
         try {
-            return cabinDAL.findAllByStateTrue();
+            List<Cabin> cabins = cabinDAL.findAllByStateTrue();
+            List<CabinDTO> cabinsDTO = new ArrayList<CabinDTO>();
+            for (Cabin cabin : cabins) {
+                cabinsDTO.add(convertir(cabin));
+            }
+            return cabinsDTO;
         } catch (Exception e) {
             throw new RuntimeException("Error getting all cabins", e);
         }
     }
 
     @Override
-    public Cabin getCabinById(Long id) {
+    public CabinDTO getCabinById(Long id) {
         try {
-            return cabinDAL.findByIdAndStateTrue(id);
+            Cabin cabin = cabinDAL.findByIdAndStateTrue(id);
+            return convertir(cabin);
         } catch (Exception e) {
             throw new RuntimeException("Error getting a cabin", e);
         }
     }
 
     @Override
-    public Cabin addCabin(Cabin cabin) {
+    public CabinDTO addCabin(CabinDTO cabinDTO) {
         try {
-            return cabinDAL.save(cabin);
+            Cabin newCabin = convertir(cabinDTO);
+            return convertir(cabinDAL.save(newCabin));
         } catch (Exception e) {
             throw new RuntimeException("Error adding a cabin", e);
         }
     }
 
     @Override
-    public Cabin updateCabin(Cabin cabin) {
+    public CabinDTO updateCabin(CabinDTO cabinDTO) {
         try {
-            return cabinDAL.save(cabin);
+            Cabin cabin = convertir(cabinDTO);
+            return convertir(cabinDAL.save(cabin));
         } catch (Exception e) {
             throw new RuntimeException("Error updating a cabin", e);
         }

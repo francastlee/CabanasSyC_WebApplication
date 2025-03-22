@@ -5,47 +5,91 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.castleedev.cabanassyc_backend.DAL.IRolDAL;
+import com.castleedev.cabanassyc_backend.DAL.IUserDAL;
 import com.castleedev.cabanassyc_backend.DAL.IUserRolDAL;
+import com.castleedev.cabanassyc_backend.DTO.UserRolDTO;
+import com.castleedev.cabanassyc_backend.Models.Rol;
+import com.castleedev.cabanassyc_backend.Models.User;
 import com.castleedev.cabanassyc_backend.Models.UserRol;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IUserRolService;
-
+import java.util.ArrayList;
 @Service
 public class UserRolService implements IUserRolService {
     
     @Autowired
     private IUserRolDAL userRolDAL;
 
+    @Autowired
+    private IUserDAL userDAL;
+
+    @Autowired
+    private IRolDAL rolDAL;
+
+    UserRolDTO convertir (UserRol userRol) {
+        return new UserRolDTO(
+            userRol.getId(), 
+            userRol.getUser().getId(), 
+            userRol.getRol().getId(), 
+            userRol.isState()
+        );
+    }
+
+    UserRol convertir (UserRolDTO userRolDTO) {
+        User user = userDAL.findByIdAndStateTrue(userRolDTO.getUserId());
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        Rol rol = rolDAL.findByIdAndStateTrue(userRolDTO.getRolId());
+        if (rol == null) {
+            throw new RuntimeException("Rol not found");
+        }
+        return new UserRol(
+            userRolDTO.getId(), 
+            user, 
+            rol, 
+            userRolDTO.isState()
+        );
+    }
     @Override
-    public List<UserRol> getAllUserRoles() {
+    public List<UserRolDTO> getAllUserRoles() {
         try {
-            return userRolDAL.findAllByStateTrue();
+            List<UserRol> userRols = userRolDAL.findAllByStateTrue();
+            List<UserRolDTO> userRolDTOs = new ArrayList<UserRolDTO>();
+            for (UserRol userRol : userRols) {
+                userRolDTOs.add(convertir(userRol));
+            }
+            return userRolDTOs;
         } catch (Exception e) {
             throw new RuntimeException("Error getting all user roles", e);
         }
     }
 
     @Override
-    public UserRol getUserRolById(Long id) {
+    public UserRolDTO getUserRolById(Long id) {
         try {
-            return userRolDAL.findByIdAndStateTrue(id);
+            UserRol userRol = userRolDAL.findByIdAndStateTrue(id);
+            return convertir(userRol);
         } catch (Exception e) {
             throw new RuntimeException("Error getting user role by id", e);
         }
     }
 
     @Override
-    public UserRol addUserRol(UserRol userRol) {
+    public UserRolDTO addUserRol(UserRolDTO userRolDTO) {
         try {
-            return userRolDAL.save(userRol);
+            UserRol newUserRol = convertir(userRolDTO);
+            return convertir(userRolDAL.save(newUserRol));
         } catch (Exception e) {
-            throw new RuntimeException("Error adding user role", e);
+            throw new RuntimeException("Error adding user role: " + e.getMessage());
         }
     }
 
     @Override
-    public UserRol updateUserRol(UserRol userRol) {
+    public UserRolDTO updateUserRol(UserRolDTO userRolDTO) {
         try {
-            return userRolDAL.save(userRol);
+            UserRol userRol = convertir(userRolDTO);
+            return convertir(userRolDAL.save(userRol));
         } catch (Exception e) {
             throw new RuntimeException("Error updating user role", e);
         }

@@ -2,14 +2,14 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.Cabin;
+import com.castleedev.cabanassyc_backend.DTO.CabinDTO;
 
 public interface ICabinService {
 
-    public List<Cabin> getAllCabins();
-    public Cabin getCabinById(Long id);
-    public Cabin addCabin(Cabin cabin);
-    public Cabin updateCabin(Cabin cabin);
+    public List<CabinDTO> getAllCabins();
+    public CabinDTO getCabinById(Long id);
+    public CabinDTO addCabin(CabinDTO cabin);
+    public CabinDTO updateCabin(CabinDTO cabin);
     public void deleteCabin(Long id);
     
 } 

@@ -2,14 +2,14 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.Contact;
+import com.castleedev.cabanassyc_backend.DTO.ContactDTO;
 
 public interface IContactService {
     
-    public List<Contact> getAllContacts();
-    public Contact getContactById(Long id);
-    public Contact addContact(Contact contact);
-    public Contact updateContact(Contact contact);
+    public List<ContactDTO> getAllContacts();
+    public ContactDTO getContactById(Long id);
+    public ContactDTO addContact(ContactDTO contact);
+    public ContactDTO updateContact(ContactDTO contact);
     public void deleteContact(Long id);
     
 }

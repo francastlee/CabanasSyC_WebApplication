@@ -2,14 +2,13 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.CabinBooking;
-
+import com.castleedev.cabanassyc_backend.DTO.CabinBookingDTO;
 public interface ICabinBookingService {
     
-    public List<CabinBooking> getAllCabinBookings();
-    public CabinBooking getCabinBookingById(Long id);
-    public CabinBooking addCabinBooking(CabinBooking cabinBooking);
-    public CabinBooking updateCabinBooking(CabinBooking cabinBooking);
+    public List<CabinBookingDTO> getAllCabinBookings();
+    public CabinBookingDTO getCabinBookingById(Long id);
+    public CabinBookingDTO addCabinBooking(CabinBookingDTO cabinBookingDTO);
+    public CabinBookingDTO updateCabinBooking(CabinBookingDTO cabinBookingDTO);
     public void deleteCabinBooking(Long id);
     
 }

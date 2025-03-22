@@ -8,17 +8,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "cabinbooking")
+@AllArgsConstructor
+@NoArgsConstructor
 public class CabinBooking {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cabinBookingId")
-    private Long cabinBookingId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "cabinId")
@@ -31,4 +35,5 @@ public class CabinBooking {
     private int adultsQuantity;
     private int childrenQuantity;
     private boolean state;
+    
 }

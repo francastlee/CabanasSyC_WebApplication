@@ -2,14 +2,14 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.Tour;
+import com.castleedev.cabanassyc_backend.DTO.TourDTO;
 
 public interface ITourService {
     
-    public List<Tour> getAllTours();
-    public Tour getTourById(Long id);
-    public Tour addTour(Tour tour);
-    public Tour updateTour(Tour tour);
+    public List<TourDTO> getAllTours();
+    public TourDTO getTourById(Long id);
+    public TourDTO addTour(TourDTO tourDTO);
+    public TourDTO updateTour(TourDTO tourDTO);
     public void deleteTour(Long id);
     
 }

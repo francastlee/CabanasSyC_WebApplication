@@ -9,17 +9,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "cabintype")
+@AllArgsConstructor
+@NoArgsConstructor
 public class CabinType {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cabinTypeId")
-    private Long cabinTypeId;
+    private Long id;
     
     private String name;
     private int capacity;
@@ -28,5 +32,13 @@ public class CabinType {
 
     @OneToMany(mappedBy = "cabinType")
     private List<Cabin> cabins;
+
+    public CabinType(Long id, String name, int capacity, Double price, boolean state) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.price = price;
+        this.state = state;
+    }
 
 }

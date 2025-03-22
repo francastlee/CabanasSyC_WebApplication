@@ -17,8 +17,8 @@ public interface ITourDAL extends JpaRepository<Tour, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Tour c SET c.state = false WHERE c.tourId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE Tour c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     Tour findByIdAndStateTrue(Long id);
 

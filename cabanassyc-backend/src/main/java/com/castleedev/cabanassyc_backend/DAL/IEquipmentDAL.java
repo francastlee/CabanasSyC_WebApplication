@@ -17,8 +17,8 @@ public interface IEquipmentDAL extends JpaRepository<Equipment, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Equipment c SET c.state = false WHERE c.equipmentId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE Equipment c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     Equipment findByIdAndStateTrue(Long id);
 

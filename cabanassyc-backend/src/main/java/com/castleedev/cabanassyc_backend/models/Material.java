@@ -11,17 +11,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "material")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Material {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "materialId")
-    private Long materialId;
+    private Long id;
 
     private String name;
     private int stock;
@@ -34,5 +38,13 @@ public class Material {
 
     @OneToMany(mappedBy = "material")
     private List<MaterialRequest> materialRequestList;
+
+    public Material(Long id, String name, int stock, MaterialType materialType, boolean state) {
+        this.id = id;
+        this.name = name;
+        this.stock = stock;
+        this.materialType = materialType;
+        this.state = state;
+    }
     
 }

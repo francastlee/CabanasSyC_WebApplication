@@ -17,8 +17,8 @@ public interface IContactDAL extends JpaRepository<Contact, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Contact c SET c.state = false WHERE c.contactId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE Contact c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     Contact findByIdAndStateTrue(Long id);
 

@@ -2,14 +2,14 @@ package com.castleedev.cabanassyc_backend.Services.Interfaces;
 
 import java.util.List;
 
-import com.castleedev.cabanassyc_backend.Models.Booking;
+import com.castleedev.cabanassyc_backend.DTO.BookingDTO;
 
 public interface IBookingService {
     
-    public List<Booking> getAllBookings();
-    public Booking getBookingById(Long id);
-    public Booking addBooking(Booking booking);
-    public Booking updateBooking(Booking booking);
+    public List<BookingDTO> getAllBookings();
+    public BookingDTO getBookingById(Long id);
+    public BookingDTO addBooking(BookingDTO bookingDTO);
+    public BookingDTO updateBooking(BookingDTO bookingDTO);
     public void deleteBooking(Long id);
     
 }

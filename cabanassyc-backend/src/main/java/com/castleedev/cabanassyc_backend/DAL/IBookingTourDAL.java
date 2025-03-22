@@ -17,8 +17,8 @@ public interface IBookingTourDAL extends JpaRepository<BookingTour, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE BookingTour c SET c.state = false WHERE c.bookingTourId = :id")
-    boolean softDeleteById(@Param("id") Long id);
+    @Query("UPDATE BookingTour c SET c.state = false WHERE c.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     BookingTour findByIdAndStateTrue(Long id);
 
