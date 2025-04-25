@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.BookingDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IBookingService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
@@ -27,91 +29,41 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllBookings() {
-        try {
-            List<BookingDTO> bookings = bookingService.getAllBookings();
-            ApiResponse<List<BookingDTO>> apiResponse = new ApiResponse<>(true, "Bookings found successfully", bookings);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<BookingDTO>>> getAllBookings() {
+        List<BookingDTO> bookings = bookingService.getAllBookings();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Bookings found successfully", bookings)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBookingById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            BookingDTO booking = bookingService.getBookingById(id);
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(true, "Booking found successfully", booking);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<BookingDTO>> getBookingById(@PathVariable("id") Long id) {
+        BookingDTO booking = bookingService.getBookingById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking found successfully", booking)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addBooking(@RequestBody BookingDTO booking) {
-        try {
-            BookingDTO newBooking = new BookingDTO();
-            newBooking.setUserId(booking.getUserId());
-            newBooking.setDate(booking.getDate());
-            newBooking.setTotalPrice(booking.getTotalPrice());
-            newBooking.setState(true);
-            bookingService.addBooking(newBooking);
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(true, "Booking added successfully", newBooking);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<BookingDTO>> addBooking(@Valid @RequestBody BookingDTO booking) {
+        BookingDTO newBooking = bookingService.addBooking(booking);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Booking added successfully", newBooking));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateBooking(@PathVariable("id") Long id, @RequestBody BookingDTO booking) {
-        try {
-            if (id <= 0) {
-                ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            booking.setId(id);
-            BookingDTO updatedBooking = bookingService.updateBooking(booking);
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(true, "Booking updated successfully", updatedBooking);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<BookingDTO>> updateBooking(@Valid @RequestBody BookingDTO booking) {
+        BookingDTO updatedBooking = bookingService.updateBooking(booking);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking updated successfully", updatedBooking)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteBooking(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            BookingDTO booking = bookingService.getBookingById(id);
-            bookingService.deleteBooking(id);
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(true, "Booking deleted successfully", booking);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingDTO> apiResponse = new ApiResponse<>(false, e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteBooking(@PathVariable("id") Long id) {
+        bookingService.deleteBooking(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking deleted successfully", null)
+        );
     }
 }

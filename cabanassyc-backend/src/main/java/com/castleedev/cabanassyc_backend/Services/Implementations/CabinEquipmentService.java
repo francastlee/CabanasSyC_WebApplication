@@ -1,9 +1,12 @@
 package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.castleedev.cabanassyc_backend.DAL.ICabinDAL;
 import com.castleedev.cabanassyc_backend.DAL.ICabinEquipmentDAL;
@@ -14,100 +17,134 @@ import com.castleedev.cabanassyc_backend.Models.CabinEquipment;
 import com.castleedev.cabanassyc_backend.Models.Equipment;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ICabinEquipmentService;
 
-import java.util.ArrayList;
-
 @Service
+@Transactional
 public class CabinEquipmentService implements ICabinEquipmentService {
 
-    @Autowired
-    private ICabinEquipmentDAL cabinEquipmentDAL;
+    private final ICabinEquipmentDAL cabinEquipmentDAL;
+    private final ICabinDAL cabinDAL;
+    private final IEquipmentDAL equipmentDAL;
 
-    @Autowired
-    private ICabinDAL cabinDAL;
+    public CabinEquipmentService(ICabinEquipmentDAL cabinEquipmentDAL,
+                               ICabinDAL cabinDAL,
+                               IEquipmentDAL equipmentDAL) {
+        this.cabinEquipmentDAL = cabinEquipmentDAL;
+        this.cabinDAL = cabinDAL;
+        this.equipmentDAL = equipmentDAL;
+    }
 
-    @Autowired
-    private IEquipmentDAL equipmentDAL;
+    @Override
+    @Transactional(readOnly = true)
+    public List<CabinEquipmentDTO> getAllCabinEquipments() {
+        List<CabinEquipment> cabinEquipments = cabinEquipmentDAL.findAllByStateTrue();
+        if (cabinEquipments.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "No cabin equipment found"
+            );
+        }
+
+        return cabinEquipments.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CabinEquipmentDTO getCabinEquipmentById(Long id) {
+        CabinEquipment cabinEquipment = cabinEquipmentDAL.findByIdAndStateTrue(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Cabin equipment not found"
+            ));
+        
+        return convertToDTO(cabinEquipment);
+    }
+
+    @Override
+    public CabinEquipmentDTO addCabinEquipment(CabinEquipmentDTO cabinEquipmentDTO) {
+        CabinEquipment cabinEquipment = convertToEntity(cabinEquipmentDTO);
+        cabinEquipment.setState(true);
+        CabinEquipment savedCabinEquipment = cabinEquipmentDAL.save(cabinEquipment);
+
+        return convertToDTO(savedCabinEquipment);
+    }
+
+    @Override
+public CabinEquipmentDTO updateCabinEquipment(CabinEquipmentDTO cabinEquipmentDTO) {
+    CabinEquipment existingCabinEquipment = cabinEquipmentDAL.findByIdAndStateTrue(cabinEquipmentDTO.getId())
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, 
+            "Cabin equipment not found"
+        ));
     
+    Equipment equipment = equipmentDAL.findByIdAndStateTrue(cabinEquipmentDTO.getEquipmentId())
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, 
+            "Equipment not found"
+        ));
 
-    CabinEquipmentDTO convertir (CabinEquipment cabinEquipment) {
-        CabinEquipmentDTO cabinEquipmentDTO = new CabinEquipmentDTO(
+    Cabin cabin = cabinDAL.findByIdAndStateTrue(cabinEquipmentDTO.getCabinId())
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, 
+            "Cabin not found"
+        ));
+
+    existingCabinEquipment.setCabin(cabin);
+    existingCabinEquipment.setEquipment(equipment);
+    existingCabinEquipment.setState(cabinEquipmentDTO.isState());
+    CabinEquipment updatedCabinEquipment = cabinEquipmentDAL.save(existingCabinEquipment);
+    
+    return convertToDTO(updatedCabinEquipment);
+}
+
+    @Override
+    public void deleteCabinEquipment(Long id) {
+        if (cabinEquipmentDAL.findByIdAndStateTrue(id).isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Cabin equipment not found"
+            );
+        }
+        int rowsAffected = cabinEquipmentDAL.softDeleteById(id);
+        if (rowsAffected == 0) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Failed to delete cabin equipment"
+            );
+        }    
+    }
+
+    private CabinEquipmentDTO convertToDTO(CabinEquipment cabinEquipment) {
+        if (cabinEquipment == null) return null;
+        
+        return new CabinEquipmentDTO(
             cabinEquipment.getId(),
             cabinEquipment.getCabin().getId(),
             cabinEquipment.getEquipment().getId(),
             cabinEquipment.isState()
         );
-        return cabinEquipmentDTO;
     }
 
-    CabinEquipment convertir (CabinEquipmentDTO cabinEquipmentDTO) {
-        Equipment equipment = equipmentDAL.findByIdAndStateTrue(cabinEquipmentDTO.getEquipmentId());
-        if (equipment == null) {
-            throw new RuntimeException("Equipment not found");
-        }
-        Cabin cabin = cabinDAL.findByIdAndStateTrue(cabinEquipmentDTO.getCabinId());
-        if (cabin == null) {
-            throw new RuntimeException("Cabin not found");
-        }
-        CabinEquipment cabinEquipment = new CabinEquipment(
+    private CabinEquipment convertToEntity(CabinEquipmentDTO cabinEquipmentDTO) {
+        if (cabinEquipmentDTO == null) return null;
+
+        Cabin cabin = cabinDAL.findByIdAndStateTrue(cabinEquipmentDTO.getCabinId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Cabin not found"
+            ));
+        Equipment equipment = equipmentDAL.findByIdAndStateTrue(cabinEquipmentDTO.getEquipmentId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Equipment not found"
+            ));
+
+        return new CabinEquipment(
             cabinEquipmentDTO.getId(),
             cabin,
             equipment,
             cabinEquipmentDTO.isState()
         );
-        return cabinEquipment;
     }
-
-    @Override
-    public List<CabinEquipmentDTO> getAllCabinEquipments() {
-        try {
-            List<CabinEquipment> cabinEquipments = cabinEquipmentDAL.findAllByStateTrue();
-            List<CabinEquipmentDTO> cabinEquipmentsDTO = new ArrayList<CabinEquipmentDTO>();
-            for (CabinEquipment cabinEquipment : cabinEquipments) {
-                cabinEquipmentsDTO.add(convertir(cabinEquipment));
-            }
-            return cabinEquipmentsDTO;
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting all cabin equipments: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public CabinEquipmentDTO getCabinEquipmentById(Long id) {
-        try {
-            CabinEquipment cabinEquipment = cabinEquipmentDAL.findByIdAndStateTrue(id);
-            return convertir(cabinEquipment);
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting cabin equipment by id: "+ e.getMessage());
-        }
-    }
-
-    @Override
-    public CabinEquipmentDTO addCabinEquipment(CabinEquipmentDTO cabinEquipmentDTO) {
-        try {
-            CabinEquipment newCabinEquipment = convertir(cabinEquipmentDTO);
-            return convertir(cabinEquipmentDAL.save(newCabinEquipment)); 
-        } catch (Exception e) {
-            throw new RuntimeException("Error adding cabin equipment: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public CabinEquipmentDTO updateCabinEquipment(CabinEquipmentDTO cabinEquipmentDTO) {
-        try {
-            CabinEquipment cabinEquipment = convertir(cabinEquipmentDTO);
-            return convertir(cabinEquipmentDAL.save(cabinEquipment));
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating cabin equipment: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteCabinEquipment(Long id) {
-        try {
-            cabinEquipmentDAL.softDeleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting cabin equipment: " + e.getMessage());
-        }
-    }
-    
 }

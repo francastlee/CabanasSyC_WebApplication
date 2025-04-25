@@ -5,6 +5,7 @@ import com.castleedev.cabanassyc_backend.Models.Tour;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,8 +19,8 @@ public interface ITourDAL extends JpaRepository<Tour, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Tour c SET c.state = false WHERE c.id = :id")
-    void softDeleteById(@Param("id") Long id);
+    int softDeleteById(@Param("id") Long id);
 
-    Tour findByIdAndStateTrue(Long id);
+    Optional<Tour> findByIdAndStateTrue(Long id);
 
 }

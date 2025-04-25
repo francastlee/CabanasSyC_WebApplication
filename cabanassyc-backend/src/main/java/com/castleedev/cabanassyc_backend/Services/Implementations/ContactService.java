@@ -1,25 +1,100 @@
 package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.castleedev.cabanassyc_backend.DAL.IContactDAL;
 import com.castleedev.cabanassyc_backend.DTO.ContactDTO;
 import com.castleedev.cabanassyc_backend.Models.Contact;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IContactService;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
+@Transactional
 public class ContactService implements IContactService {
 
-    @Autowired
-    private IContactDAL contactDAL;
+    private final IContactDAL contactDAL;
 
-    ContactDTO convertir (Contact contact) {
+    public ContactService(IContactDAL contactDAL) {
+        this.contactDAL = contactDAL;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContactDTO> getAllContacts() {
+        List<Contact> contacts = contactDAL.findAllByStateTrue();
+        if (contacts.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "No contacts found"
+            );
+        }
+
+        return contacts.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ContactDTO getContactById(Long id) {
+        Contact contact = contactDAL.findByIdAndStateTrue(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Contact not found"
+            ));
+
+        return convertToDTO(contact);
+    }
+
+    @Override
+    public ContactDTO addContact(ContactDTO contactDTO) {
+        Contact contact = convertToEntity(contactDTO);
+        contact.setState(true);
+        contact.setRead(false);
+        Contact savedContact = contactDAL.save(contact);
+
+        return convertToDTO(savedContact);
+    }
+
+    @Override
+    public ContactDTO updateContact(ContactDTO contactDTO) {
+        if (contactDAL.findByIdAndStateTrue(contactDTO.getId()).isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Contact not found"
+            );
+        }
+        Contact contact = convertToEntity(contactDTO);
+        Contact updatedContact = contactDAL.save(contact);
+        
+        return convertToDTO(updatedContact);
+    }
+
+    @Override
+    public void deleteContact(Long id) {
+        if (contactDAL.findByIdAndStateTrue(id).isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Contact not found"
+            );
+        }
+        int rowAffected = contactDAL.softDeleteById(id);
+        if (rowAffected <= 0) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to delete contact"
+            );
+        }
+    }
+
+    private ContactDTO convertToDTO(Contact contact) {
+        if (contact == null) return null;
+        
         return new ContactDTO(
             contact.getId(),
             contact.getFirstName(),
@@ -33,7 +108,9 @@ public class ContactService implements IContactService {
         );
     }
 
-    Contact convertir (ContactDTO contactDTO) {
+    private Contact convertToEntity(ContactDTO contactDTO) {
+        if (contactDTO == null) return null;
+        
         return new Contact(
             contactDTO.getId(),
             contactDTO.getFirstName(),
@@ -46,73 +123,4 @@ public class ContactService implements IContactService {
             contactDTO.isState()
         );
     }
-
-    @Override
-    public List<ContactDTO> getAllContacts() {
-        try {
-            List<Contact> contacts = contactDAL.findAllByStateTrue();
-            List<ContactDTO> contactsDTO = new ArrayList<ContactDTO>();
-            for (Contact contact : contacts) {
-                contactsDTO.add(convertir(contact));
-            }
-            return contactsDTO; 
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting all contacts", e);
-        }
-    }
-
-    @Override
-    public ContactDTO getContactById(Long id) {
-        try {
-            Contact contact = contactDAL.findByIdAndStateTrue(id);
-            if (contact != null) {
-                return convertir(contact);
-            } else {
-                throw new EntityNotFoundException("Contact not found or already deleted");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting a contact", e);
-        }
-    }
-
-    @Override
-    public ContactDTO addContact(ContactDTO contactDTO) {
-        try {
-            Contact contact = convertir(contactDTO);
-            return convertir(contactDAL.save(contact));
-        } catch (Exception e) {
-            throw new RuntimeException("Error adding a contact", e);
-        }
-    }
-
-    @Override
-    public ContactDTO updateContact(ContactDTO contactDTO) {
-        try {
-            Contact contact = new Contact(
-                contactDTO.getId(),
-                contactDTO.getFirstName(),
-                contactDTO.getLastName(),
-                contactDTO.getEmail(),
-                contactDTO.getPhone(),
-                contactDTO.getMessage(),
-                contactDTO.getDate(),
-                contactDTO.isRead(),
-                contactDTO.isState()
-            );
-            return convertir(contactDAL.save(contact));
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating a contact", e);
-        }
-    }
-
-    @Override
-    public void deleteContact(Long id) {
-        Contact contact = contactDAL.findByIdAndStateTrue(id);
-        if (contact != null) {
-            contactDAL.softDeleteById(id);
-        } else {
-            throw new EntityNotFoundException("Contact not found or already deleted");
-        }
-    }
-    
 }

@@ -5,6 +5,7 @@ import com.castleedev.cabanassyc_backend.Models.CabinBooking;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,8 +19,8 @@ public interface ICabinBookingDAL extends JpaRepository<CabinBooking, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE CabinBooking c SET c.state = false WHERE c.id = :id")
-    void softDeleteById(@Param("id") Long id);
+    int softDeleteById(@Param("id") Long id);
 
-    CabinBooking findByIdAndStateTrue(Long id);
+    Optional<CabinBooking> findByIdAndStateTrue(Long id);
 
 }

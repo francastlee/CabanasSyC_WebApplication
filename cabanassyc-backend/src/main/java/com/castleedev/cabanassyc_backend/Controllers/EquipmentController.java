@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.EquipmentDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IEquipmentService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/equipments")
 public class EquipmentController {
@@ -27,105 +29,41 @@ public class EquipmentController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllEquipments() {
-        try {
-            List<EquipmentDTO> equipments = equipmentService.getAllEquipments();
-            if (equipments.isEmpty()) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "No equipments found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<EquipmentDTO>> apiResponse = new ApiResponse<>(true, "Equipments found successfully", equipments);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<EquipmentDTO>>> getAllEquipments() {
+        List<EquipmentDTO> equipments = equipmentService.getAllEquipments();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Equipments found successfully", equipments)
+        );  
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEquipmentById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            EquipmentDTO equipment = equipmentService.getEquipmentById(id);
-            if (equipment == null) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Equipment not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(true, "Equipment found successfully", equipment);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Error during the get process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<EquipmentDTO>> getEquipmentById(@PathVariable("id") Long id) {
+        EquipmentDTO equipment = equipmentService.getEquipmentById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Equipment found successfully", equipment)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addEquipment(@RequestBody EquipmentDTO equipment) {
-        try {
-            if (equipment.getName() == null) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Name must be a valid name");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            EquipmentDTO newEquipment = new EquipmentDTO();
-            newEquipment.setName(equipment.getName());
-            newEquipment.setState(true);
-            equipmentService.addEquipment(newEquipment);
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(true, "Equipment added successfully", newEquipment);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Error during the add process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<EquipmentDTO>> addEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) {
+        EquipmentDTO createdEquipment = equipmentService.addEquipment(equipmentDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Equipment created successfully", createdEquipment));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateEquipment(@PathVariable("id") Long id, @RequestBody EquipmentDTO equipment) {
-        try {
-            if (id <= 0) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            equipment.setId(id);
-            EquipmentDTO updatedEquipment = equipmentService.updateEquipment(equipment);
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(true, "Equipment updated successfully", updatedEquipment);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<EquipmentDTO>> updateEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) {
+        EquipmentDTO updatedEquipment = equipmentService.updateEquipment(equipmentDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Equipment updated successfully", updatedEquipment)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteEquipment(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            EquipmentDTO equipment = equipmentService.getEquipmentById(id);
-            if (equipment == null) {
-                ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Equipment not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            equipmentService.deleteEquipment(id);
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(true, "Equipment deleted successfully", equipment);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<EquipmentDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteEquipment(@PathVariable("id") Long id) {
+        equipmentService.deleteEquipment(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Equipment deleted successfully", null)
+        );
     }
 }

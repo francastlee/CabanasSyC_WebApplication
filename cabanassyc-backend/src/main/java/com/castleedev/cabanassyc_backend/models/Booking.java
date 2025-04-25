@@ -30,7 +30,7 @@ public class Booking {
     
     @ManyToOne
     @JoinColumn(name = "userId")
-    private User user;
+    private UserModel user;
 
     private LocalDate date;
     Double totalPrice;
@@ -42,7 +42,7 @@ public class Booking {
     @OneToMany(mappedBy = "booking")
     private List<BookingTour> bookingTourList;
 
-    public Booking(Long id, User user, LocalDate date, Double totalPrice, boolean state) {
+    public Booking(Long id, UserModel user, LocalDate date, Double totalPrice, boolean state) {
         this.id = id;
         this.user = user;
         this.date = date;

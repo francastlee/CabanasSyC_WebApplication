@@ -2,128 +2,109 @@ package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.castleedev.cabanassyc_backend.DAL.IUserDAL;
 import com.castleedev.cabanassyc_backend.DTO.UserDTO;
-import com.castleedev.cabanassyc_backend.Models.User;
+import com.castleedev.cabanassyc_backend.Models.UserModel;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IUserService;
-import java.util.ArrayList;
 
 @Service
+@Transactional
 public class UserService implements IUserService {
-    
-    @Autowired
-    private IUserDAL userDAL;
 
+    private final IUserDAL userDAL;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(PasswordEncoder passwordEncoder) {
+    public UserService(IUserDAL userDAL, PasswordEncoder passwordEncoder) {
+        this.userDAL = userDAL;
         this.passwordEncoder = passwordEncoder;
     }
 
-    UserDTO convertir (User user) {
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDTO> getAllUsers() {
+        List<UserModel> users = userDAL.findAllByStateTrue();
+        if (users.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "No users found"
+            );
+        }
+        return users.stream()
+            .map(this::convertToDTO)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDTO getUserById(Long id) {
+        UserModel user = userDAL.findByIdAndStateTrue(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "User not found"
+            ));
+        return convertToDTO(user);
+    }
+
+    @Override
+    public UserDTO addUser(UserDTO userDTO) {        
+        UserModel user = convertToEntity(userDTO);
+        user.setPasswordHashed(passwordEncoder.encode(userDTO.getPassword()));
+        user.setState(true);
+        UserModel savedUser = userDAL.save(user);
+        
+        return convertToDTO(savedUser);
+    }
+
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+        UserModel existingUser = userDAL.findByIdAndStateTrue(userDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found"
+            ));
+        UserModel user = convertToEntity(userDTO);
+        updatePasswordIfChanged(user, existingUser);
+        UserModel updatedUser = userDAL.save(user);
+
+        return convertToDTO(updatedUser);
+    }
+
+    private UserDTO convertToDTO(UserModel user) {
         return new UserDTO(
             user.getId(), 
             user.getFirstName(), 
             user.getLastName(), 
             user.getEmail(),
+            null,
             user.getHourlyRate(), 
             user.isState()
         );
     }
 
-    User convertir (UserDTO userDTO) {
-        return new User(
+    private UserModel convertToEntity(UserDTO userDTO) {
+        return new UserModel(
             userDTO.getId(), 
             userDTO.getFirstName(), 
             userDTO.getLastName(), 
             userDTO.getEmail(), 
-            userDTO.getPassword(),
+            null,
             userDTO.getHourlyRate(), 
-            userDTO.isState()
+            userDTO.getState()
         );
     }
 
-    @Override
-    public List<UserDTO> getAllUsers() {
-        try {
-            List<User> users = userDAL.findAllByStateTrue();
-            List<UserDTO> usersDTO = new ArrayList<UserDTO>();
-            for (User user : users) {
-                usersDTO.add(convertir(user));
-            }
-            return usersDTO;
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting all users: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public UserDTO getUserById(Long id) {
-        try {
-            User user = userDAL.findByIdAndStateTrue(id);
-            if (user == null) {
-                throw new RuntimeException("User not found");
-            }
-            return convertir(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting user by id" + e.getMessage());
-        }
-    }
-
-    @Override
-    public UserDTO addUser(UserDTO userDTO) {
-        try {
-            User user = convertir(userDTO);
-
-            if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
-                String passwordHashed = passwordEncoder.encode(userDTO.getPassword());
-                user.setPasswordHashed(passwordHashed);
-            } else {
-                throw new IllegalArgumentException("Password cannot be null or empty");
-            }
-
-            return convertir(userDAL.save(user));
-        } catch (Exception e) {
-            throw new RuntimeException("Error adding user: " + e.getMessage());
-        }
-    }
-
-    @Override
-public UserDTO updateUser(UserDTO userDTO) {
-    try {
-        User existingUser = userDAL.findByIdAndStateTrue(userDTO.getId());
-        if (existingUser == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-
-        User user = convertir(userDTO);
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank() && 
-            !passwordEncoder.matches(userDTO.getPassword(), existingUser.getPasswordHashed())) {
-            
-            String passwordHashed = passwordEncoder.encode(userDTO.getPassword());
-            user.setPasswordHashed(passwordHashed);
+    private void updatePasswordIfChanged(UserModel newUser, UserModel existingUser) {
+        if (newUser.getPasswordHashed() != null && 
+            !passwordEncoder.matches(newUser.getPasswordHashed(), existingUser.getPasswordHashed())) {
+            newUser.setPasswordHashed(passwordEncoder.encode(newUser.getPasswordHashed()));
         } else {
-            user.setPasswordHashed(existingUser.getPasswordHashed());
-        }
-        return convertir(userDAL.save(user));
-
-    } catch (Exception e) {
-        throw new RuntimeException("Error updating user", e);
-    }
-}
-
-
-    @Override
-    public void deleteUser(Long id) {
-        try {
-            userDAL.softDeleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting user", e);
+            newUser.setPasswordHashed(existingUser.getPasswordHashed());
         }
     }
-    
 }

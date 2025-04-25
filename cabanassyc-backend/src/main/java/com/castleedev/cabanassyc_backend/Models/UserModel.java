@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +44,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<WorkingDay> workingDayList;
 
-    public User(Long id, String firstName, String lastName, String email, String passwordHashed, double hourlyRate, boolean state) {
+    public UserModel(Long id, String firstName, String lastName, String email, String passwordHashed, double hourlyRate, boolean state) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

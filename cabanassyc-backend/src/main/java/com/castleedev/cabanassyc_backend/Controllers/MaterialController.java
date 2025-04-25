@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.MaterialDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IMaterialService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/materials")
 public class MaterialController {
@@ -27,108 +29,41 @@ public class MaterialController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllMaterials() {
-        try {
-            List<MaterialDTO> materials = materialService.getAllMaterials();
-            if (materials.isEmpty()) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "No materials found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<MaterialDTO>> apiResponse = new ApiResponse<>(true, "Materials found successfully", materials);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<MaterialDTO>>> getAllMaterials() {
+        List<MaterialDTO> materials = materialService.getAllMaterials();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Materials found successfully", materials)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMaterialById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            MaterialDTO material = materialService.getMaterialById(id);
-            if (material == null) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Material not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(true, "Material found successfully", material);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Error during the getById process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
-    }
-    
-    @PostMapping
-    public ResponseEntity<?> addMaterial(@RequestBody MaterialDTO material) {
-        try {
-            if (material.getName() == null) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Material name is required");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            MaterialDTO newMaterial = new MaterialDTO();
-            newMaterial.setName(material.getName());
-            newMaterial.setStock(material.getStock());
-            newMaterial.setMaterialTypeId(material.getMaterialTypeId());
-            newMaterial.setState(true);
-            materialService.addMaterial(newMaterial);
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(true, "Material added successfully", newMaterial);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Error during the add process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<MaterialDTO>> getMaterialById(@PathVariable("id") Long id) {
+        MaterialDTO material = materialService.getMaterialById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Material found successfully", material)
+        );
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateMaterial(@PathVariable("id") Long id, @RequestBody MaterialDTO material) {
-        try {
-            if (id <= 0) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            material.setId(id);
-            MaterialDTO materialUpdated = materialService.updateMaterial(material);
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(true, "Material updated successfully", materialUpdated);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PostMapping
+    public ResponseEntity<ApiResponse<MaterialDTO>> addMaterial(@Valid @RequestBody MaterialDTO materialDTO) {
+        MaterialDTO createdMaterial = materialService.addMaterial(materialDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Material created successfully", createdMaterial));
+    }
+
+    @PutMapping
+    public ResponseEntity<ApiResponse<MaterialDTO>> updateMaterial(@Valid @RequestBody MaterialDTO materialDTO) {
+        MaterialDTO updatedMaterial = materialService.updateMaterial(materialDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Material updated successfully", updatedMaterial)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteMaterial(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            MaterialDTO material = materialService.getMaterialById(id);
-            if (material == null) {
-                ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Material not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            materialService.deleteMaterial(id);
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(true, "Material deleted successfully", material);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<MaterialDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteMaterial(@PathVariable("id") Long id) {
+        materialService.deleteMaterial(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Material deleted successfully", null)
+        );
     }
-
 }

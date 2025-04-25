@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.CabinBookingDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ICabinBookingService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/cabinbookings")
+@RequestMapping("/cabin-bookings")
 public class CabinBookingController {
     
     private final ICabinBookingService cabinBookingService;
@@ -27,105 +29,41 @@ public class CabinBookingController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllCabinBookings() {
-        try {
-            List<CabinBookingDTO> cabinBookings = cabinBookingService.getAllCabinBookings();
-            if (cabinBookings.isEmpty()) {
-                ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "No cabin bookings found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<CabinBookingDTO>> apiResponse = new ApiResponse<>(true, "Cabin bookings found successfully", cabinBookings);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<CabinBookingDTO>>> getAllCabinBookings() {
+        List<CabinBookingDTO> cabinBookings = cabinBookingService.getAllCabinBookings();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Cabin bookings found successfully", cabinBookings)
+        );
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCabinBookingById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            CabinBookingDTO cabinBooking = cabinBookingService.getCabinBookingById(id);
-            if (cabinBooking == null) {
-                ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Cabin booking not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(true, "Cabin booking found successfully", cabinBooking);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Error during the getById process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<CabinBookingDTO>> getCabinBookingById(@PathVariable("id") Long id) {
+        CabinBookingDTO cabinBooking = cabinBookingService.getCabinBookingById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Cabin booking found successfully", cabinBooking)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addCabinBooking(@RequestBody CabinBookingDTO cabinBooking) {
-        try {
-            CabinBookingDTO newCabinBooking = new CabinBookingDTO();
-            newCabinBooking.setBookingId(cabinBooking.getBookingId());
-            newCabinBooking.setCabinId(cabinBooking.getCabinId());
-            newCabinBooking.setAdultsQuantity(cabinBooking.getAdultsQuantity());
-            newCabinBooking.setChildrenQuantity(cabinBooking.getChildrenQuantity());
-            newCabinBooking.setState(true);
-            cabinBookingService.addCabinBooking(newCabinBooking);
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(true, "Cabin booking added successfully", newCabinBooking);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Error during the add process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<CabinBookingDTO>> addCabinBooking(@Valid @RequestBody CabinBookingDTO cabinBookingDTO) {
+        CabinBookingDTO createdBooking = cabinBookingService.addCabinBooking(cabinBookingDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Cabin booking created successfully", createdBooking));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCabinBooking(@PathVariable("id") Long id, @RequestBody CabinBookingDTO cabinBooking) {
-        try {
-            if (id <= 0) {
-                ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            cabinBooking.setId(id);
-            CabinBookingDTO updatedCabinBooking = cabinBookingService.updateCabinBooking(cabinBooking);
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(true, "Cabin booking updated successfully", updatedCabinBooking);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<CabinBookingDTO>> updateCabinBooking(@Valid @RequestBody CabinBookingDTO cabinBookingDTO) {
+        CabinBookingDTO updatedBooking = cabinBookingService.updateCabinBooking(cabinBookingDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Cabin booking updated successfully", updatedBooking)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteCabinBooking(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            CabinBookingDTO cabinBooking = cabinBookingService.getCabinBookingById(id);
-            if (cabinBooking == null) {
-                ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Cabin booking not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            cabinBookingService.deleteCabinBooking(id);
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(true, "Cabin booking deleted successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<CabinBookingDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteCabinBooking(@PathVariable("id") Long id) {
+        cabinBookingService.deleteCabinBooking(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Cabin booking deleted successfully", null)
+        );
     }
-
 }

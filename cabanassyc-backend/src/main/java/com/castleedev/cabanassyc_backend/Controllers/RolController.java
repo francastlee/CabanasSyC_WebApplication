@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.RolDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IRolService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/rols")
+@RequestMapping("/roles")
 public class RolController {
     
     private final IRolService rolService;
@@ -27,101 +29,41 @@ public class RolController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllRols() {
-        try {
-            List<RolDTO> rols = rolService.getAllRoles();
-            if (rols.isEmpty()) {
-                ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "No rols found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<RolDTO>> apiResponse = new ApiResponse<>(true, "Rols found successfully", rols);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<RolDTO>>> getAllRoles() {
+        List<RolDTO> roles = rolService.getAllRoles();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Roles found successfully", roles)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRolById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            RolDTO rol = rolService.getRolById(id);
-            if (rol == null) {
-                ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Rol not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(true, "Rol found successfully", rol);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Error during the getById process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<RolDTO>> getRolById(@PathVariable("id") Long id) {
+        RolDTO rol = rolService.getRolById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Role found successfully", rol)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addRol(@RequestBody RolDTO rol) {
-        try {
-            RolDTO newRol = new RolDTO();
-            newRol.setName(rol.getName());
-            newRol.setState(true);
-            rolService.addRol(newRol);
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(true, "Rol created successfully", newRol);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Error during the create process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<RolDTO>> addRol(@Valid @RequestBody RolDTO rolDTO) {
+        RolDTO createdRol = rolService.addRol(rolDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Role created successfully", createdRol));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateRol(@PathVariable("id") Long id, @RequestBody RolDTO rol) {
-        try {
-            if (id <= 0) {
-                ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            rol.setId(id);
-            RolDTO updatedRol = rolService.updateRol(rol);
-            if (updatedRol == null) {
-                ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Rol not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(true, "Rol updated successfully", updatedRol);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<RolDTO>> updateRol(@Valid @RequestBody RolDTO rolDTO) {
+        RolDTO updatedRol = rolService.updateRol(rolDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Role updated successfully", updatedRol)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteRol(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            rolService.deleteRol(id);
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(true, "Rol deleted successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<RolDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteRol(@PathVariable("id") Long id) {
+        rolService.deleteRol(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Role deleted successfully", null)
+        );
     }
-
 }

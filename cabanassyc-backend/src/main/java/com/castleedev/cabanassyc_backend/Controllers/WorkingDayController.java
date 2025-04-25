@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.WorkingDayDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IWorkingDayService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/workingdays")
+@RequestMapping("/working-days")
 public class WorkingDayController {
     
     private final IWorkingDayService workingDayService;
@@ -27,105 +29,41 @@ public class WorkingDayController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllWorkingDays() {
-        try {
-            List<WorkingDayDTO> workingDays = workingDayService.getAllWorkingDays();
-            if (workingDays.isEmpty()) {
-                ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "No workingDays found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<WorkingDayDTO>> apiResponse = new ApiResponse<>(true, "WorkingDays found successfully", workingDays);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<WorkingDayDTO>>> getAllWorkingDays() {
+        List<WorkingDayDTO> workingDays = workingDayService.getAllWorkingDays();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Working days found successfully", workingDays)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getWorkingDayById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            WorkingDayDTO workingDay = workingDayService.getWorkingDayById(id);
-            if (workingDay == null) {
-                ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "WorkingDay not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(true, "WorkingDay found successfully", workingDay);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Error during the getById process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<WorkingDayDTO>> getWorkingDayById(@PathVariable("id") Long id) {
+        WorkingDayDTO workingDay = workingDayService.getWorkingDayById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Working day found successfully", workingDay)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addWorkingDay(@RequestBody WorkingDayDTO workingDay) {
-        try {
-            WorkingDayDTO newWorkingDay = new WorkingDayDTO();
-            newWorkingDay.setUserId(workingDay.getUserId());
-            newWorkingDay.setDate(workingDay.getDate());
-            newWorkingDay.setCheckInTime(workingDay.getCheckInTime());
-            newWorkingDay.setCheckOutTime(workingDay.getCheckOutTime());
-            newWorkingDay.setState(true);
-            workingDayService.addWorkingDay(newWorkingDay);
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(true, "WorkingDay added successfully", newWorkingDay);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Error during the add process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<WorkingDayDTO>> addWorkingDay(@Valid @RequestBody WorkingDayDTO workingDayDTO) {
+        WorkingDayDTO createdWorkingDay = workingDayService.addWorkingDay(workingDayDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Working day created successfully", createdWorkingDay));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateWorkingDay(@PathVariable("id") Long id, @RequestBody WorkingDayDTO workingDay) {
-        try {
-            if (id <= 0) {
-                ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            workingDay.setId(id);
-            WorkingDayDTO updatedWorkingDay = workingDayService.updateWorkingDay(workingDay);
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(true, "WorkingDay updated successfully", updatedWorkingDay);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<WorkingDayDTO>> updateWorkingDay(@Valid @RequestBody WorkingDayDTO workingDayDTO) {
+        WorkingDayDTO updatedWorkingDay = workingDayService.updateWorkingDay(workingDayDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Working day updated successfully", updatedWorkingDay)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteWorkingDay(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            WorkingDayDTO workingDay = workingDayService.getWorkingDayById(id);
-            if (workingDay == null) {
-                ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "WorkingDay not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            workingDayService.deleteWorkingDay(id);
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(true, "WorkingDay deleted successfully", workingDay);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<WorkingDayDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteWorkingDay(@PathVariable("id") Long id) {
+        workingDayService.deleteWorkingDay(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Working day deleted successfully", null)
+        );
     }
-    
 }

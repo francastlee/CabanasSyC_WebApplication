@@ -1,5 +1,9 @@
 package com.castleedev.cabanassyc_backend.DTO;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,12 +14,25 @@ import lombok.NoArgsConstructor;
 public class UserDTO {
     
     private Long id;
-    private String firstName;
-    private String lastName;
+    
+    @NotBlank(message = "Email es requerido")
+    @Email(message = "Email debe ser válido")
     private String email;
+    
+    @NotBlank(message = "Nombre es requerido")
+    private String firstName;
+    
+    @NotBlank(message = "Apellido es requerido")
+    private String lastName;
+    
+    @NotBlank(message = "Contraseña es requerida")
+    @Size(min = 8, message = "Contraseña debe tener al menos 8 caracteres")
     private String password;
-    private double hourlyRate;
-    private boolean state;
+    
+    @PositiveOrZero(message = "Tarifa por hora debe ser positiva")
+    private Double hourlyRate;
+    
+    private Boolean state;
 
     public UserDTO(Long id, String firstName, String lastName, String email, double hourlyRate, boolean state) {
         this.id = id;

@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "management.endpoints.enabled-by-default",
+    "type": "java.lang.String",
+    "description": "A description for 'management.endpoints.enabled-by-default'"
+  },
+  {
+    "name": "management.endpoints.web.exposure.include",
+    "type": "java.lang.String",
+    "description": "A description for 'management.endpoints.web.exposure.include'"
+  }
+]}

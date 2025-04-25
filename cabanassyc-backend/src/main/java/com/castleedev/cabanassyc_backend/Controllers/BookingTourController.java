@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.BookingTourDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IBookingTourService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/bookingtours")
+@RequestMapping("/booking-tours")
 public class BookingTourController {
     
     private final IBookingTourService bookingTourService;
@@ -27,104 +29,41 @@ public class BookingTourController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getAllBookingTours() {
-        try {
-            List<BookingTourDTO> bookingTours = bookingTourService.getAllBookingTours();
-            if (bookingTours.isEmpty()) {
-                ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "No booking tours found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<BookingTourDTO>> apiResponse = new ApiResponse<>(true, "Booking tours found successfully", bookingTours);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<BookingTourDTO>>> getAllBookingTours() {
+        List<BookingTourDTO> bookingTours = bookingTourService.getAllBookingTours();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking tours found successfully", bookingTours)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBookingTourById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            BookingTourDTO bookingTour = bookingTourService.getBookingTourById(id);
-            if (bookingTour == null) {
-                ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Booking tour not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(true, "Booking tour found successfully", bookingTour);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Error during the get process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<BookingTourDTO>> getBookingTourById(@PathVariable("id") Long id) {
+        BookingTourDTO bookingTour = bookingTourService.getBookingTourById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking tour found successfully", bookingTour)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addBookingTour(@RequestBody BookingTourDTO bookingTour) {
-        try {
-            BookingTourDTO newBookingTour = new BookingTourDTO();
-            newBookingTour.setBookingId(bookingTour.getBookingId());
-            newBookingTour.setTourId(bookingTour.getTourId());
-            newBookingTour.setPeople(bookingTour.getPeople());
-            newBookingTour.setState(true);
-            bookingTourService.addBookingTour(newBookingTour);
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(true, "Booking tour added successfully", newBookingTour);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Error during the add process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<BookingTourDTO>> addBookingTour(@Valid @RequestBody BookingTourDTO bookingTourDTO) {
+        BookingTourDTO createdBookingTour = bookingTourService.addBookingTour(bookingTourDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new ApiResponse<>(true, "Booking tour created successfully", createdBookingTour));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateBookingTour(@PathVariable("id") Long id, @RequestBody BookingTourDTO bookingTour) {
-        try {
-            if (id <= 0) {
-                ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            bookingTour.setId(id);
-            BookingTourDTO updatedBookingTour = bookingTourService.updateBookingTour(bookingTour);
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(true, "Booking tour updated successfully", updatedBookingTour);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<BookingTourDTO>> updateBookingTour(@Valid @RequestBody BookingTourDTO bookingTourDTO) {
+        BookingTourDTO updatedBookingTour = bookingTourService.updateBookingTour(bookingTourDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking tour updated successfully", updatedBookingTour)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteBookingTour(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            BookingTourDTO bookingTour = bookingTourService.getBookingTourById(id);
-            if (bookingTour == null) {
-                ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Booking tour not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            bookingTourService.deleteBookingTour(id);
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(true, "Booking tour deleted successfully", bookingTour);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<BookingTourDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteBookingTour(@PathVariable("id") Long id) {
+        bookingTourService.deleteBookingTour(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Booking tour deleted successfully", null)
+        );
     }
-
 }
