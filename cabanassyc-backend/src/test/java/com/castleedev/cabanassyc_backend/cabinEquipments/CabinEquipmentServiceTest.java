@@ -1,4 +1,4 @@
-package com.castleedev.cabanassyc_backend.cabinEquipment;
+package com.castleedev.cabanassyc_backend.cabinEquipments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

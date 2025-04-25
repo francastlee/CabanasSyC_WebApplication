@@ -63,16 +63,23 @@ public class ContactService implements IContactService {
 
     @Override
     public ContactDTO updateContact(ContactDTO contactDTO) {
-        if (contactDAL.findByIdAndStateTrue(contactDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
+        Contact existingContact = contactDAL.findByIdAndStateTrue(contactDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, 
                 "Contact not found"
-            );
-        }
-        Contact contact = convertToEntity(contactDTO);
-        Contact updatedContact = contactDAL.save(contact);
+            ));
         
-        return convertToDTO(updatedContact);
+        existingContact.setFirstName(contactDTO.getFirstName());
+        existingContact.setLastName(contactDTO.getLastName());
+        existingContact.setEmail(contactDTO.getEmail());
+        existingContact.setPhone(contactDTO.getPhone());
+        existingContact.setMessage(contactDTO.getMessage());
+        existingContact.setRead(contactDTO.isRead());
+        existingContact.setDate(contactDTO.getDate());
+        existingContact.setState(contactDTO.isState());
+        existingContact = contactDAL.save(existingContact);
+        
+        return convertToDTO(existingContact);
     }
 
     @Override

@@ -73,16 +73,26 @@ public class MaterialRequestService implements IMaterialRequestService {
 
     @Override
     public MaterialRequestDTO updateMaterialRequest(MaterialRequestDTO materialRequestDTO) {
-        if (materialRequestDAL.findByIdAndStateTrue(materialRequestDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
+        MaterialRequest existingMaterialRequest = materialRequestDAL.findByIdAndStateTrue(materialRequestDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
                 "Material request not found"
-            );
-        }
-        MaterialRequest materialRequest = convertToEntity(materialRequestDTO);
-        MaterialRequest updatedMaterialRequest = materialRequestDAL.save(materialRequest);
+            ));
+        existingMaterialRequest.setUser(userDAL.findByIdAndStateTrue(materialRequestDTO.getUserId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found"
+            )));
+        existingMaterialRequest.setMaterial(materialDAL.findByIdAndStateTrue(materialRequestDTO.getMaterialId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Material not found"
+            )));
+        existingMaterialRequest.setQuantity(materialRequestDTO.getQuantity());
+        existingMaterialRequest.setState(materialRequestDTO.isState());
+        existingMaterialRequest = materialRequestDAL.save(existingMaterialRequest);
 
-        return convertToDTO(updatedMaterialRequest);
+        return convertToDTO(existingMaterialRequest);
     }
 
     @Override

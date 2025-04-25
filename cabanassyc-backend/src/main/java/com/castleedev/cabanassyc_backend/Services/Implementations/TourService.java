@@ -62,16 +62,20 @@ public class TourService implements ITourService {
 
     @Override
     public TourDTO updateTour(TourDTO tourDTO) {
-        if (tourDAL.findByIdAndStateTrue(tourDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
+        Tour existingTour = tourDAL.findByIdAndStateTrue(tourDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
                 "Tour not found"
-            );
-        }
-        Tour tour = convertToEntity(tourDTO);
-        Tour updatedTour = tourDAL.save(tour);
+            ));
+        existingTour.setName(tourDTO.getName());
+        existingTour.setCapacity(tourDTO.getCapacity());
+        existingTour.setPrice(tourDTO.getPrice());
+        existingTour.setStartTime(tourDTO.getStartTime());
+        existingTour.setEndTime(tourDTO.getEndTime());
+        existingTour.setState(tourDTO.isState());
+        existingTour = tourDAL.save(existingTour);
 
-        return convertToDTO(updatedTour);
+        return convertToDTO(existingTour);
     }
 
     @Override

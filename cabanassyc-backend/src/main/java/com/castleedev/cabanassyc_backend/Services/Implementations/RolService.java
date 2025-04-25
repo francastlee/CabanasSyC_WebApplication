@@ -71,16 +71,15 @@ public class RolService implements IRolService {
         @CacheEvict(value = "roles", key = "'all'")
     })
     public RolDTO updateRol(RolDTO rolDTO) {
-        if (rolDAL.findByIdAndStateTrue(rolDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
+        Rol existingRol = rolDAL.findByIdAndStateTrue(rolDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
                 "Role not found"
-            );
-        }
-        Rol rol = convertToEntity(rolDTO);
-        Rol updatedRol = rolDAL.save(rol);
+            ));
+        existingRol.setName(rolDTO.getName());
+        existingRol.setState(rolDTO.isState());
 
-        return convertToDTO(updatedRol);
+        return convertToDTO(existingRol);
     }
 
     @Override

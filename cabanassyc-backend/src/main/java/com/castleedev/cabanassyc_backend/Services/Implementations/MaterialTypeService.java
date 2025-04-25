@@ -72,16 +72,17 @@ public class MaterialTypeService implements IMaterialTypeService {
         @CacheEvict(value = "materialType", key = "'all'")
     })
     public MaterialTypeDTO updateMaterialType(MaterialTypeDTO materialTypeDTO) {
-        if (materialTypeDAL.findByIdAndStateTrue(materialTypeDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
+        MaterialType existingMaterialType = materialTypeDAL.findByIdAndStateTrue(materialTypeDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
                 "Material type not found"
-            );
-        }
-        MaterialType materialType = convertToEntity(materialTypeDTO);
-        MaterialType updatedMaterialType = materialTypeDAL.save(materialType);
+            ));
 
-        return convertToDTO(updatedMaterialType);
+        existingMaterialType.setName(materialTypeDTO.getName());
+        existingMaterialType.setState(materialTypeDTO.isState());
+        existingMaterialType = materialTypeDAL.save(existingMaterialType);
+
+        return convertToDTO(existingMaterialType);
     }
 
     @Override

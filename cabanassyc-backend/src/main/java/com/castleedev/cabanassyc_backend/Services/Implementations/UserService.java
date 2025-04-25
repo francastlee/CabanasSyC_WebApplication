@@ -68,10 +68,18 @@ public class UserService implements IUserService {
                 HttpStatus.NOT_FOUND,
                 "User not found"
             ));
-        UserModel user = convertToEntity(userDTO);
-        updatePasswordIfChanged(user, existingUser);
-        UserModel updatedUser = userDAL.save(user);
-
+        
+        existingUser.setFirstName(userDTO.getFirstName());
+        existingUser.setLastName(userDTO.getLastName());
+        existingUser.setEmail(userDTO.getEmail());
+        existingUser.setHourlyRate(userDTO.getHourlyRate());
+        existingUser.setState(userDTO.getState());
+        
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            existingUser.setPasswordHashed(passwordEncoder.encode(userDTO.getPassword()));
+        }
+        
+        UserModel updatedUser = userDAL.save(existingUser);
         return convertToDTO(updatedUser);
     }
 

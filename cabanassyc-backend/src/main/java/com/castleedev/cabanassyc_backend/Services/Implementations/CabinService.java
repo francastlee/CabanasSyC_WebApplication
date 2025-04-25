@@ -75,16 +75,22 @@ public class CabinService implements ICabinService {
         @CacheEvict(value = "cabins", key = "'all'")
     })
     public CabinDTO updateCabin(CabinDTO cabinDTO) {
-        if (cabinDAL.findByIdAndStateTrue(cabinDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
+        Cabin existingCabin = cabinDAL.findByIdAndStateTrue(cabinDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Cabin not found"
-            );
-        }
-        Cabin cabin = convertToEntity(cabinDTO);
-        Cabin updatedCabin = cabinDAL.save(cabin);
-        
-        return convertToDTO(updatedCabin);
+            ));
+        CabinType cabinType = cabinTypeDAL.findByIdAndStateTrue(cabinDTO.getCabinTypeId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Cabin type not found"
+            ));
+        existingCabin.setName(cabinDTO.getName());
+        existingCabin.setCabinType(cabinType);
+        existingCabin.setState(cabinDTO.isState());
+        existingCabin = cabinDAL.save(existingCabin);
+
+        return convertToDTO(existingCabin);
     }
 
     @Override
