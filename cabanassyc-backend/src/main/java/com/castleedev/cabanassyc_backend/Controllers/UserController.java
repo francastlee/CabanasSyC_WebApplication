@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -94,49 +93,13 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
-        try {
-            if (id <= 0) {
-                ApiResponse<UserDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            if (userDTO == null) {
-                ApiResponse<UserDTO> apiResponse = new ApiResponse<>(false, "Invalid user");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            userDTO.setId(id);
-            UserDTO user = userService.updateUser(userDTO);
-            if (user == null) {
-                ApiResponse<UserDTO> apiResponse = new ApiResponse<>(false, "Error updating user");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-            }
-            ApiResponse<UserDTO> apiResponse = new ApiResponse<>(true, "User updated successfully", user);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<UserDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
+        UserDTO user = userService.updateUser(userDTO);
+        return ResponseEntity.ok(new ApiResponse<>(
+            true, 
+            "User updated successfully",
+            user
+        ));   
     }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<UserDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            userService.deleteUser(id);
-            ApiResponse<UserDTO> apiResponse = new ApiResponse<>(true, "User deleted successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<UserDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
-    }
-
 }

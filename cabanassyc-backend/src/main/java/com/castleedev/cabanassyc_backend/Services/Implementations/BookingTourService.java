@@ -1,8 +1,9 @@
 package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.castleedev.cabanassyc_backend.DAL.IBookingDAL;
@@ -13,102 +14,139 @@ import com.castleedev.cabanassyc_backend.Models.Booking;
 import com.castleedev.cabanassyc_backend.Models.BookingTour;
 import com.castleedev.cabanassyc_backend.Models.Tour;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IBookingTourService;
-import java.util.ArrayList;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 
 @Service
-public class BookingTourService implements IBookingTourService{
+@Transactional
+public class BookingTourService implements IBookingTourService {
 
-    @Autowired
-    private IBookingTourDAL bookingTourDAL;
+    private final IBookingTourDAL bookingTourDAL;
+    private final IBookingDAL bookingDAL;
+    private final ITourDAL tourDAL;
 
-    @Autowired
-    private IBookingDAL bookingDAL;
-
-    @Autowired
-    private ITourDAL tourDAL;
-
-    BookingTourDTO convertir (BookingTour bookingTour){
-        return new BookingTourDTO(
-            bookingTour.getId(), 
-            bookingTour.getBooking().getId(), 
-            bookingTour.getTour().getId(), 
-            bookingTour.getPeople(), 
-            bookingTour.isState()
-        );
-    }
-
-    BookingTour convertir (BookingTourDTO bookingTourDTO){
-        Booking booking = bookingDAL.findByIdAndStateTrue(bookingTourDTO.getBookingId());
-        if (booking == null) {
-            throw new RuntimeException("Booking not found");
-        }
-        Tour tour = tourDAL.findByIdAndStateTrue(bookingTourDTO.getTourId());
-        if (tour == null) {
-            throw new RuntimeException("Tour not found");
-        }
-        return new BookingTour(
-            bookingTourDTO.getId(), 
-            booking,
-            tour,
-            bookingTourDTO.getPeople(), 
-            bookingTourDTO.isState()
-        );
+    public BookingTourService(IBookingTourDAL bookingTourDAL,
+                            IBookingDAL bookingDAL,
+                            ITourDAL tourDAL) {
+        this.bookingTourDAL = bookingTourDAL;
+        this.bookingDAL = bookingDAL;
+        this.tourDAL = tourDAL;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingTourDTO> getAllBookingTours() {
-        try {
-            List<BookingTour> bookingTours = bookingTourDAL.findAllByStateTrue();
-            List<BookingTourDTO> bookingToursDTO = new ArrayList<BookingTourDTO>();
-            for (BookingTour bookingTour : bookingTours) {
-                bookingToursDTO.add(convertir(bookingTour));
-            }
-            return bookingToursDTO;
-        } catch (Exception e) {
-            throw e;
+        List<BookingTour> bookingsTour = bookingTourDAL.findAllByStateTrue();
+        if (bookingsTour.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "No bookings tour found"
+            );
         }
+
+        return bookingsTour.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingTourDTO getBookingTourById(Long id) {
-        try {
-            BookingTour bookingTour = bookingTourDAL.findByIdAndStateTrue(id);
-            if (bookingTour == null) {
-                throw new RuntimeException("BookingTour not found");
-            }
-            return convertir(bookingTour);
-        } catch (Exception e) {
-            throw e;
-        }
+       BookingTour bookingTour = bookingTourDAL.findByIdAndStateTrue(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Booking tour not found"
+            ));
+            
+        return convertToDTO(bookingTour);
     }
 
     @Override
     public BookingTourDTO addBookingTour(BookingTourDTO bookingTourDTO) {
-       try {
-            BookingTour bookingTour = convertir(bookingTourDTO);
-            return convertir(bookingTourDAL.save(bookingTour));
-        } catch (Exception e) {
-            throw e;
-        }
+        BookingTour bookingTour = convertToEntity(bookingTourDTO);
+        bookingTour.setState(true);
+        BookingTour savedBookingTour = bookingTourDAL.save(bookingTour);
+
+        return convertToDTO(savedBookingTour);
     }
 
     @Override
     public BookingTourDTO updateBookingTour(BookingTourDTO bookingTourDTO) {
-        try {
-            BookingTour bookingTour = convertir(bookingTourDTO);
-            return convertir(bookingTourDAL.save(bookingTour));
-        } catch (Exception e) {
-            throw e;
-        }
+        BookingTour existing = bookingTourDAL.findByIdAndStateTrue(bookingTourDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Booking tour not found"
+            ));
+
+        existing.setBooking(bookingDAL.findByIdAndStateTrue(bookingTourDTO.getBookingId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Booking not found"
+            )));
+        existing.setTour(tourDAL.findByIdAndStateTrue(bookingTourDTO.getTourId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Tour not found"
+            )));
+        existing.setPeople(bookingTourDTO.getPeople());
+        existing.setState(bookingTourDTO.isState());
+        
+        BookingTour updated = bookingTourDAL.save(existing);
+        return convertToDTO(updated);
     }
 
     @Override
     public void deleteBookingTour(Long id) {
-        try {
-            bookingTourDAL.softDeleteById(id);
-        } catch (Exception e) {
-            throw e;
+        if (bookingTourDAL.findByIdAndStateTrue(id).isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Booking tour not found"
+            );
+        }
+        int rowsAffected = bookingTourDAL.softDeleteById(id);
+        if (rowsAffected <= 0) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Failed to delete booking tour"
+            );
         }
     }
-    
+
+    private BookingTourDTO convertToDTO(BookingTour bookingTour) {
+        if (bookingTour == null) return null;
+        
+        return new BookingTourDTO(
+            bookingTour.getId(),
+            bookingTour.getBooking().getId(),
+            bookingTour.getTour().getId(),
+            bookingTour.getPeople(),
+            bookingTour.isState()
+        );
+    }
+
+    private BookingTour convertToEntity(BookingTourDTO bookingTourDTO) {
+        if (bookingTourDTO == null) return null;
+
+        Booking booking = bookingDAL.findByIdAndStateTrue(bookingTourDTO.getBookingId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Booking not found"
+            ));
+        
+        Tour tour = tourDAL.findByIdAndStateTrue(bookingTourDTO.getTourId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Tour not found"
+            ));
+
+        return new BookingTour(
+            bookingTourDTO.getId(),
+            booking,
+            tour,
+            bookingTourDTO.getPeople(),
+            bookingTourDTO.isState()
+        );
+    }
 }

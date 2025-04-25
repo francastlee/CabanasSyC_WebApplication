@@ -5,6 +5,7 @@ import com.castleedev.cabanassyc_backend.Models.Rol;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,8 +19,10 @@ public interface IRolDAL extends JpaRepository<Rol, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Rol c SET c.state = false WHERE c.id = :id")
-    void softDeleteById(@Param("id") Long id);
+    int softDeleteById(@Param("id") Long id);
 
-    Rol findByIdAndStateTrue(Long id);
+    Optional<Rol> findByIdAndStateTrue(Long id);
+
+    Optional<Rol> findByNameAndStateTrue(String name);
 
 }

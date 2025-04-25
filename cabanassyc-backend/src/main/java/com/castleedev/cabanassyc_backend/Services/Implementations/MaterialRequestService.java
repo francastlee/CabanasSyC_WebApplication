@@ -1,9 +1,12 @@
 package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.castleedev.cabanassyc_backend.DAL.IMaterialDAL;
 import com.castleedev.cabanassyc_backend.DAL.IMaterialRequestDAL;
@@ -11,104 +14,126 @@ import com.castleedev.cabanassyc_backend.DAL.IUserDAL;
 import com.castleedev.cabanassyc_backend.DTO.MaterialRequestDTO;
 import com.castleedev.cabanassyc_backend.Models.Material;
 import com.castleedev.cabanassyc_backend.Models.MaterialRequest;
-import com.castleedev.cabanassyc_backend.Models.User;
+import com.castleedev.cabanassyc_backend.Models.UserModel;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IMaterialRequestService;
-import java.util.ArrayList;
 
 @Service
-public class MaterialRequestService implements IMaterialRequestService{
+@Transactional
+public class MaterialRequestService implements IMaterialRequestService {
     
-    @Autowired
-    private IMaterialRequestDAL materialRequestDAL;
+    private final IMaterialRequestDAL materialRequestDAL;
+    private final IUserDAL userDAL;
+    private final IMaterialDAL materialDAL;
 
-    @Autowired
-    private IUserDAL userDAL;
+    public MaterialRequestService(
+            IMaterialRequestDAL materialRequestDAL,
+            IUserDAL userDAL,
+            IMaterialDAL materialDAL) {
+        this.materialRequestDAL = materialRequestDAL;
+        this.userDAL = userDAL;
+        this.materialDAL = materialDAL;
+    }
 
-    @Autowired
-    private IMaterialDAL materialDAL;
+    @Override
+    @Transactional(readOnly = true)
+    public List<MaterialRequestDTO> getAllMaterialRequests() {
+        List<MaterialRequest> materialRequests = materialRequestDAL.findAllByStateTrue();
+        if (materialRequests.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "No material requests found"
+            );  
+        }
 
-    MaterialRequestDTO convertir (MaterialRequest materialRequest) {
+        return materialRequests.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MaterialRequestDTO getMaterialRequestById(Long id) {
+        MaterialRequest materialRequest = materialRequestDAL.findByIdAndStateTrue(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Material request not found"
+            ));
+
+        return convertToDTO(materialRequest);
+    }
+
+    @Override
+    public MaterialRequestDTO addMaterialRequest(MaterialRequestDTO materialRequestDTO) {
+        MaterialRequest materialRequest = convertToEntity(materialRequestDTO);
+        materialRequest.setState(true);
+        MaterialRequest savedMaterialRequest = materialRequestDAL.save(materialRequest);
+
+        return convertToDTO(savedMaterialRequest);
+    }
+
+    @Override
+    public MaterialRequestDTO updateMaterialRequest(MaterialRequestDTO materialRequestDTO) {
+        if (materialRequestDAL.findByIdAndStateTrue(materialRequestDTO.getId()).isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Material request not found"
+            );
+        }
+        MaterialRequest materialRequest = convertToEntity(materialRequestDTO);
+        MaterialRequest updatedMaterialRequest = materialRequestDAL.save(materialRequest);
+
+        return convertToDTO(updatedMaterialRequest);
+    }
+
+    @Override
+    public void deleteMaterialRequest(Long id) {
+        if (materialRequestDAL.findByIdAndStateTrue(id).isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Material request not found"
+            );
+        }
+        int rowAffected = materialRequestDAL.softDeleteById(id);
+        if (rowAffected <= 0) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to delete material request"
+            );
+        }   
+    }
+
+    private MaterialRequestDTO convertToDTO(MaterialRequest materialRequest) {
+        if (materialRequest == null) return null;
+        
         return new MaterialRequestDTO(
             materialRequest.getId(), 
             materialRequest.getUser().getId(), 
             materialRequest.getMaterial().getId(), 
             materialRequest.getQuantity(), 
             materialRequest.isState()
-        ); 
+        );
     }
 
-    MaterialRequest convertir (MaterialRequestDTO materialRequestDTO) {
-        User user = userDAL.findByIdAndStateTrue(materialRequestDTO.getUserId());
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-        Material material = materialDAL.findByIdAndStateTrue(materialRequestDTO.getMaterialId());
-        if (material == null) {
-            throw new RuntimeException("Material not found");
-        }
+    private MaterialRequest convertToEntity(MaterialRequestDTO materialRequestDTO) {
+        if (materialRequestDTO == null) return null;
+        
+        UserModel user = userDAL.findByIdAndStateTrue(materialRequestDTO.getUserId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found"
+            ));
+        Material material = materialDAL.findByIdAndStateTrue(materialRequestDTO.getMaterialId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Material not found"
+            ));
+
         return new MaterialRequest(
             materialRequestDTO.getId(), 
             user,
             material,
             materialRequestDTO.getQuantity(), 
             materialRequestDTO.isState()
-        ); 
+        );
     }
-
-    @Override
-    public List<MaterialRequestDTO> getAllMaterialRequests() {
-        try {
-            List<MaterialRequest> materialRequests = materialRequestDAL.findAllByStateTrue();
-            List<MaterialRequestDTO> materialRequestsDTO = new ArrayList<MaterialRequestDTO>();
-            for (MaterialRequest materialRequest : materialRequests) {
-                materialRequestsDTO.add(convertir(materialRequest));
-            }
-            return materialRequestsDTO;
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting all material requests", e);
-        }
-    }
-
-    @Override
-    public MaterialRequestDTO getMaterialRequestById(Long id) {
-        try {
-            MaterialRequest materialRequest = materialRequestDAL.findByIdAndStateTrue(id);
-            if (materialRequest == null) {
-                throw new RuntimeException("Material request not found");
-            }
-            return convertir(materialRequest);
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting a material request", e);
-        }
-    }
-
-    @Override
-    public MaterialRequestDTO addMaterialRequest(MaterialRequestDTO materialRequestDTO) {
-        try {
-            MaterialRequest materialRequest = convertir(materialRequestDTO);
-            return convertir(materialRequestDAL.save(materialRequest));
-        } catch (Exception e) {
-            throw new RuntimeException("Error adding a material request", e);
-        }
-    }
-
-    @Override
-    public MaterialRequestDTO updateMaterialRequest(MaterialRequestDTO materialRequestDTO) {
-        try {
-            MaterialRequest materialRequest = convertir(materialRequestDTO);
-            return convertir(materialRequestDAL.save(materialRequest));
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating a material request", e);
-        }
-    }
-
-    @Override
-    public void deleteMaterialRequest(Long id) {
-        try {
-            materialRequestDAL.softDeleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting a material request", e);
-        }
-    }
-    
 }

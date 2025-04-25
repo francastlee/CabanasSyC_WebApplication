@@ -29,7 +29,7 @@ public class WorkingDay {
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    private User user;
+    private UserModel user;
 
     private LocalDate date;
     private Time checkInTime;

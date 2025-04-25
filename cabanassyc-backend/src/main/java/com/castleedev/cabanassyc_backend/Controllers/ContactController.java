@@ -2,7 +2,6 @@ package com.castleedev.cabanassyc_backend.Controllers;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.castleedev.cabanassyc_backend.DTO.ContactDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IContactService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/contacts")
 public class ContactController {
@@ -27,112 +28,41 @@ public class ContactController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllContacts() {
-        try {
-            List<ContactDTO> contacts = contactService.getAllContacts();
-            if (contacts.isEmpty()) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "No contacts found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<List<ContactDTO>> apiResponse = new ApiResponse<>(true, "Contacts found successfully", contacts);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Error during the getAll process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<List<ContactDTO>>> getAllContacts() {
+        List<ContactDTO> contacts = contactService.getAllContacts();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Contacts found successfully", contacts)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getContactById(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            ContactDTO contact = contactService.getContactById(id);
-            if (contact == null) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Contact not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(true, "Contact found successfully", contact);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Error during the getById process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<ContactDTO>> getContactById(@PathVariable("id") Long id) {
+        ContactDTO contact = contactService.getContactById(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Contact found successfully", contact)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> addContact (@RequestBody ContactDTO contact) {
-        try {
-            if (contact.getFirstName() == null || contact.getLastName() == null || contact.getEmail() == null || contact.getPhone() == null || contact.getMessage() == null || contact.getDate() == null) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "First name, last name, email, phone and message are required");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            ContactDTO newContact = new ContactDTO();
-            newContact.setFirstName(contact.getFirstName());
-            newContact.setLastName(contact.getLastName());
-            newContact.setEmail(contact.getEmail());
-            newContact.setPhone(contact.getPhone());
-            newContact.setMessage(contact.getMessage());
-            newContact.setDate(contact.getDate());
-            newContact.setRead(false);
-            newContact.setState(true);
-            contactService.addContact(newContact);
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(true, "Contact created successfully", newContact);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Error during the add process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<ContactDTO>> addContact(@Valid @RequestBody ContactDTO contactDTO) {
+        ContactDTO createdContact = contactService.addContact(contactDTO);
+        return ResponseEntity.ok()
+            .body(new ApiResponse<>(true, "Contact created successfully", createdContact));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateContact (@PathVariable("id") Long id,@RequestBody ContactDTO contact) {
-        try {
-            if (id <= 0) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            contact.setId(id);
-            ContactDTO updatedContact = contactService.updateContact(contact);
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(true, "Contact updated successfully", updatedContact);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Error during the update process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    @PutMapping
+    public ResponseEntity<ApiResponse<ContactDTO>> updateContact(@Valid @RequestBody ContactDTO contactDTO) {
+        ContactDTO updatedContact = contactService.updateContact(contactDTO);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Contact updated successfully", updatedContact)
+        );
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> deleteContact(@PathVariable("id") Long id) {
-        try {
-            if (id <= 0) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Invalid ID");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-            ContactDTO contact = contactService.getContactById(id);
-            if (contact == null) {
-                ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Contact not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-            }
-            contactService.deleteContact(id);
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(true, "Contact deleted successfully", contact);
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        } catch (Exception e) {
-            ApiResponse<ContactDTO> apiResponse = new ApiResponse<>(false, "Error during the delete process: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(apiResponse);
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable("id") Long id) {
+        contactService.deleteContact(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Contact deleted successfully", null)
+        );
     }
-
 }

@@ -10,6 +10,4 @@ public interface IUserService {
     public UserDTO getUserById(Long id);
     public UserDTO addUser(UserDTO userDTO);
     public UserDTO updateUser(UserDTO userDTO);
-    public void deleteUser(Long id);
-
 }
