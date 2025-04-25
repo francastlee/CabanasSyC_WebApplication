@@ -70,14 +70,21 @@ public class WorkingDayService implements IWorkingDayService {
     @Override
     public WorkingDayDTO updateWorkingDay(WorkingDayDTO workingDayDTO) {
         validateWorkingDayTimes(workingDayDTO);
-        if (workingDayDAL.findByIdAndStateTrue(workingDayDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
+        WorkingDay existingWorkingDay = workingDayDAL.findByIdAndStateTrue(workingDayDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, 
                 "Working day not found"
-            );
-        }
-        WorkingDay workingDay = convertToEntity(workingDayDTO);
-        WorkingDay updatedWorkingDay = workingDayDAL.save(workingDay);
+            ));
+        existingWorkingDay.setCheckInTime(workingDayDTO.getCheckInTime());
+        existingWorkingDay.setCheckOutTime(workingDayDTO.getCheckOutTime());
+        existingWorkingDay.setDate(workingDayDTO.getDate());
+        existingWorkingDay.setUser(userDAL.findByIdAndStateTrue(workingDayDTO.getUserId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "User not found"
+            )));
+        existingWorkingDay.setState(workingDayDTO.isState());
+        WorkingDay updatedWorkingDay = workingDayDAL.save(existingWorkingDay);
 
         return convertToDTO(updatedWorkingDay);
     }

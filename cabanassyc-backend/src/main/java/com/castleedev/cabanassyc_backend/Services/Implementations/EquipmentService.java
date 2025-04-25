@@ -72,16 +72,16 @@ public class EquipmentService implements IEquipmentService {
         @CacheEvict(value = "equipments", key = "'all'")
     })
     public EquipmentDTO updateEquipment(EquipmentDTO equipmentDTO) {
-        if (equipmentDAL.findByIdAndStateTrue(equipmentDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
+        Equipment existingEquipment = equipmentDAL.findByIdAndStateTrue(equipmentDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, 
                 "Equipment not found"
-            );
-        }
-        Equipment equipment = convertToEntity(equipmentDTO);
-        Equipment updatedEquipment = equipmentDAL.save(equipment);
-        
-        return convertToDTO(updatedEquipment);
+            ));
+        existingEquipment.setName(equipmentDTO.getName());
+        existingEquipment.setState(equipmentDTO.isState());
+        existingEquipment = equipmentDAL.save(existingEquipment);
+
+        return convertToDTO(existingEquipment);
     }
 
     @Override

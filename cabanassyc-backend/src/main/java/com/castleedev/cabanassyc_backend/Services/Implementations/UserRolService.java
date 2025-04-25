@@ -74,16 +74,25 @@ public class UserRolService implements IUserRolService {
 
     @Override
     public UserRolDTO updateUserRol(UserRolDTO userRolDTO) {
-        if (userRolDAL.findByIdAndStateTrue(userRolDTO.getId()).isEmpty()) {
-            throw new ResponseStatusException(
+        UserRol existingUserRol = userRolDAL.findByIdAndStateTrue(userRolDTO.getId())
+            .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, 
                 "User role not found"
-            );
-        }
-        UserRol userRol = convertToEntity(userRolDTO);
-        UserRol updatedUserRol = userRolDAL.save(userRol);
+            ));
+            existingUserRol.setState(userRolDTO.isState());
+        existingUserRol.setUser(userDAL.findByIdAndStateTrue(userRolDTO.getUserId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "User not found"
+            )));
+        existingUserRol.setRol(rolDAL.findByIdAndStateTrue(userRolDTO.getRolId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Role not found"
+            )));
+        existingUserRol = userRolDAL.save(existingUserRol);
 
-        return convertToDTO(updatedUserRol);
+        return convertToDTO(existingUserRol);
     }
 
     @Override
