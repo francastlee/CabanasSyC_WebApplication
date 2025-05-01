@@ -50,9 +50,10 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-               .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-               .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-               .anyRequest().authenticated()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+            .anyRequest().authenticated()
             )
             .headers(headers -> headers
                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
@@ -101,7 +102,7 @@ public class SecurityConfig {
       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
       CorsConfiguration config = new CorsConfiguration();
       config.setAllowCredentials(true);
-      config.setAllowedOriginPatterns(List.of("*"));
+      config.setAllowedOriginPatterns(List.of("http://localhost:5173"));
       config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
       config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
       config.setExposedHeaders(List.of("Content-Disposition"));

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.castleedev.cabanassyc_backend.DTO.CurrentUserDTO;
 import com.castleedev.cabanassyc_backend.DTO.UserDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IUserService;
 
@@ -63,6 +64,12 @@ public class UserController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(apiResponse);
         }
+    }
+
+    @GetMapping("/auth")
+    public ApiResponse<?> getCurrentUser() {
+        CurrentUserDTO user = userService.getCurrentUser();
+        return new ApiResponse<>(true, "User fetched successfully", user);
     }
 
     @PostMapping
