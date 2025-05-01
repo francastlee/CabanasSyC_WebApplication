@@ -1,0 +1,12 @@
+{
+  "client": {
+    "home": "Inicio",
+    "rooms": "Cabañas",
+    "tours": "Tours",
+    "facilities": "Instalaciones",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión",
+    "login": "Iniciar sesión",
+    "register": "Registrarse"
+  }
+}

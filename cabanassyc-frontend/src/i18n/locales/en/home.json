@@ -1,0 +1,24 @@
+{
+  "hero": {
+    "title": "Enjoy a magical night at Cabañas SyC",
+    "subtitle": "Nature, comfort, and adventure in La Fortuna, San Carlos",
+    "button": "Book now"
+  },
+  "roomTypes": {
+    "title": "Our room types",
+    "subtitletTripleRoom": "Triple room",
+    "descriptionTripleRoom": "Perfect for couples looking for relaxation.",
+    "subtitleDobleRoom": "Double room",
+    "descriptionDobleRoom": "Ideal for small families or groups of friends.",
+    "buttonText": "View more"
+  },
+  "discoverMore": {
+    "title": "Discover more",
+    "facilitiesTitle": "Facilities",
+    "facilitiesSubtitle": "Pool, ranch, and relaxing common areas",
+    "toursTitle": "Tours",
+    "toursSubtitle": "Explore waterfalls, volcanoes, and more",
+    "roomsTitle": "Rooms",
+    "roomsSubtitle": "Rustic cabins equipped with all comforts"
+  }
+}

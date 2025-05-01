@@ -3,12 +3,15 @@ package com.castleedev.cabanassyc_backend.Services.Implementations;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.castleedev.cabanassyc_backend.DAL.IUserDAL;
+import com.castleedev.cabanassyc_backend.DTO.CurrentUserDTO;
 import com.castleedev.cabanassyc_backend.DTO.UserDTO;
 import com.castleedev.cabanassyc_backend.Models.UserModel;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IUserService;
@@ -38,6 +41,26 @@ public class UserService implements IUserService {
         return users.stream()
             .map(this::convertToDTO)
             .toList();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public CurrentUserDTO getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserModel user = userDAL.findByEmailAndStateTrue(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        String role = user.getUserRolList().stream()
+            .findFirst()
+            .map(userRol -> userRol.getRol().getName())
+            .orElse("CLIENTE");
+
+        return new CurrentUserDTO(
+            user.getId(),
+            user.getFirstName() + " " + user.getLastName(),
+            user.getEmail(),
+            role
+        );
     }
 
     @Override
@@ -82,7 +105,7 @@ public class UserService implements IUserService {
         UserModel updatedUser = userDAL.save(existingUser);
         return convertToDTO(updatedUser);
     }
-
+    
     private UserDTO convertToDTO(UserModel user) {
         return new UserDTO(
             user.getId(), 
@@ -94,7 +117,7 @@ public class UserService implements IUserService {
             user.isState()
         );
     }
-
+    
     private UserModel convertToEntity(UserDTO userDTO) {
         return new UserModel(
             userDTO.getId(), 

@@ -1,0 +1,12 @@
+{
+  "client": {
+    "home": "Home",
+    "rooms": "Cabins",
+    "tours": "Tours",
+    "facilities": "Facilities",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  }
+}
