@@ -10,6 +10,8 @@ import navbarES from './i18n/locales/es/navbar.json';
 import footerEN from './i18n/locales/en/footer.json';
 import footerES from './i18n/locales/es/footer.json';
 
+import cabinsEN from './i18n/locales/en/cabins.json';
+import cabinsES from './i18n/locales/es/cabins.json';
 
 i18n
   .use(initReactI18next)
@@ -18,18 +20,20 @@ i18n
       en: {
         home: homeEN,
         navbar: navbarEN,
-        footer: footerEN
+        footer: footerEN,
+        cabins: cabinsEN
       },
       es: {
         home: homeES,
         navbar: navbarES,
-        footer: footerES
+        footer: footerES,
+        cabins: cabinsES
       },
     },
     lng: 'es',
     fallbackLng: 'es',
     defaultNS: 'home', 
-    ns: ['home', 'navbar', 'footer'], 
+    ns: ['home', 'navbar', 'footer', 'cabins'], 
     interpolation: {
       escapeValue: false,
     },

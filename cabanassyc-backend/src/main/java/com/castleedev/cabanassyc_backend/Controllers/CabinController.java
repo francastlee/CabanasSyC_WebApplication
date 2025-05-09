@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.castleedev.cabanassyc_backend.DTO.CabinDTO;
+import com.castleedev.cabanassyc_backend.DTO.CabinFullDTO;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ICabinService;
 
 import jakarta.validation.Valid;
@@ -35,6 +36,13 @@ public class CabinController {
             new ApiResponse<>(true, "Cabins found successfully", cabins)
         );
     }
+
+    @GetMapping("/details")
+    public ResponseEntity<ApiResponse<List<CabinFullDTO>>> getCabinDetails() {
+        List<CabinFullDTO> cabins = cabinService.getAllCabinsWithDetails();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Cabins found succesfully with details", cabins));
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CabinDTO>> getCabinById(@PathVariable("id") Long id) {

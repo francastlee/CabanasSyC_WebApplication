@@ -1,0 +1,33 @@
+{
+    "cabins": {
+        "title": "Our rooms"
+    },
+    "cabinCard": {
+        "type": "Type",
+        "capacity": "Capacity",
+        "night": "night",
+        "people": "people",
+        "bookNow": "Book now"
+    },
+    "modal": {
+        "title": "Booking {{cabin}}",
+        "fullName": "Full name",
+        "checkIn": "Check-in date",
+        "checkOut": "Check-out date",
+        "adults": "Number of adults",
+        "children": "Number of children",
+        "placeholderName": "Your name",
+        "btn": "Check availability"
+    },
+    "errors": {
+        "required": "All fields are required.",
+        "futureDate": "Check-in date must be today or in the future.",
+        "dateOrder": "Check-out date must be after the check-in date.",
+        "adultMin": "There must be at least one adult.",
+        "limit": "Total number of people must not exceed"
+    },
+    "messages":{
+        "message": "Hello! I would like to book the {{cabin}}\n\n*My name is:* {{name}}\n*Check-in:* {{checkIn}}\nCheck-out: {{checkOut}}\nAdults: {{adults}}\nChildren: {{children}}\n\nSent from cabanassyc.com\nLooking forward to your confirmation!"  
+    }
+    
+}

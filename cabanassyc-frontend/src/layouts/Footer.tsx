@@ -16,6 +16,7 @@ type FooterProps = {
   direccionLink?: string;
   correo?: string;
   telefono?: string;
+  color?: string;
   redes?: {
     facebook?: string;
     booking?: string;
@@ -28,121 +29,10 @@ type FooterProps = {
   };
 };
 
-const FooterLocation = ({
-  direccion,
-  direccionLink,
-}: {
-  direccion: string;
-  direccionLink?: string;
-}) => {
-  const { t } = useTranslation("footer");
-  return (
-    <div className="flex items-start gap-4">
-      <FaMapMarkerAlt className="text-[#4B2A1F] text-xl mt-1" />
-      <a
-        href={direccionLink || "#"}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={t("footer.location")}
-        className="hover:underline"
-      >
-        <h4 className="font-semibold">{t("footer.location")}</h4>
-        <p className="text-sm">{direccion}</p>
-      </a>
-    </div>
-  );
-};
-
-const FooterContact = ({
-  correo,
-  telefono,
-}: {
-  correo?: string;
-  telefono?: string;
-}) => {
-  const { t } = useTranslation("footer");
-  return (
-    <div className="flex items-start gap-4">
-      <FaEnvelope className="text-[#4B2A1F] text-xl mt-1" />
-      <div>
-        <h4 className="font-semibold">{t("footer.help")}</h4>
-        {correo && <p className="text-sm">{correo}</p>}
-        {telefono && <p className="text-sm">{telefono}</p>}
-      </div>
-    </div>
-  );
-};
-
-const FooterSocial = ({ redes }: { redes: FooterProps["redes"] }) => (
-  <div className="flex gap-4">
-    {redes?.facebook && (
-      <a
-        href={redes.facebook}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Facebook"
-        className="hover:text-[#4B2A1F]"
-      >
-        <FaFacebookF />
-      </a>
-    )}
-    {redes?.booking && (
-      <a
-        href={redes.booking}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Booking.com"
-        className="hover:text-[#4B2A1F]"
-      >
-        <TbBrandBooking />
-      </a>
-    )}
-    {redes?.instagram && (
-      <a
-        href={redes.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Instagram"
-        className="hover:text-[#4B2A1F]"
-      >
-        <FaInstagram />
-      </a>
-    )}
-    {redes?.whatsApp && (
-      <a
-        href={redes.whatsApp}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="WhatsApp"
-        className="hover:text-[#4B2A1F]"
-      >
-        <FaWhatsapp />
-      </a>
-    )}
-  </div>
-);
-
-const FooterDeveloper = ({
-  desarrollador,
-}: {
-  desarrollador: FooterProps["desarrollador"];
-}) => {
-  const { t } = useTranslation("footer");
-  if (!desarrollador) return null;
-  return (
-    <a
-      href={desarrollador.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Sitio del desarrollador"
-      className="flex items-center gap-2"
-    >
-      <FaCode className="text-lg" />
-      <span className="font-semibold">
-        {t("footer.dev")} {desarrollador.nombre}
-      </span>
-    </a>
-  );
+const determineColorPair = (bgColor: string) => {
+  return bgColor === "#4B2A1F"
+    ? { border: "#1a3a17", icon: "#1a3a17" }
+    : { border: "#4B2A1F", icon: "#4B2A1F" };
 };
 
 export default function Footer({
@@ -152,13 +42,16 @@ export default function Footer({
   telefono,
   redes,
   desarrollador,
+  color = "#1a3a17",
 }: FooterProps) {
   const { t } = useTranslation("footer");
+  const { border, icon } = determineColorPair(color);
 
   return (
     <footer
       role="contentinfo"
-      className="bg-[#1a3a17] text-white font-noto select-none"
+      className="text-white font-noto select-none"
+      style={{ backgroundColor: color }}
     >
       <div className="max-w-7xl mx-auto py-12 px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
         <div>
@@ -169,22 +62,98 @@ export default function Footer({
         </div>
 
         {direccion && (
-          <FooterLocation
-            direccion={direccion}
-            direccionLink={direccionLink}
-          />
+          <div className="flex items-start gap-4">
+            <FaMapMarkerAlt style={{ color: icon }} className="text-xl mt-1" />
+            <a
+              href={direccionLink || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t("footer.location")}
+              className="hover:underline"
+            >
+              <h4 className="font-semibold">{t("footer.location")}</h4>
+              <p className="text-sm">{direccion}</p>
+            </a>
+          </div>
         )}
+
         {(correo || telefono) && (
-          <FooterContact correo={correo} telefono={telefono} />
+          <div className="flex items-start gap-4">
+            <FaEnvelope style={{ color: icon }} className="text-xl mt-1" />
+            <div>
+              <h4 className="font-semibold">{t("footer.help")}</h4>
+              {correo && <p className="text-sm">{correo}</p>}
+              {telefono && <p className="text-sm">{telefono}</p>}
+            </div>
+          </div>
         )}
       </div>
 
-      <div className="border-t border-[#4B2A1F] mt-6 py-6 px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <FooterDeveloper desarrollador={desarrollador} />
+      <div
+        className="mt-6 py-6 px-6 flex flex-col md:flex-row justify-between items-center gap-4"
+        style={{ borderTop: `1px solid ${border}` }}
+      >
+        {desarrollador && (
+          <a
+            href={desarrollador.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2"
+            aria-label="Sitio del desarrollador"
+          >
+            <FaCode style={{ color: icon }} className="text-lg" />
+            <span className="font-semibold">
+              {t("footer.dev")} {desarrollador.nombre}
+            </span>
+          </a>
+        )}
+
         <p className="text-sm text-center md:text-left">
           © {new Date().getFullYear()} Cabañas SyC | {t("footer.rights")}
         </p>
-        <FooterSocial redes={redes} />
+
+        <div className="flex gap-4">
+          {redes?.facebook && (
+            <a
+              href={redes.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <FaFacebookF style={{ color: icon }} />
+            </a>
+          )}
+          {redes?.booking && (
+            <a
+              href={redes.booking}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Booking.com"
+            >
+              <TbBrandBooking style={{ color: icon }} />
+            </a>
+          )}
+          {redes?.instagram && (
+            <a
+              href={redes.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <FaInstagram style={{ color: icon }} />
+            </a>
+          )}
+          {redes?.whatsApp && (
+            <a
+              href={redes.whatsApp}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+            >
+              <FaWhatsapp style={{ color: icon }} />
+            </a>
+          )}
+        </div>
       </div>
     </footer>
   );

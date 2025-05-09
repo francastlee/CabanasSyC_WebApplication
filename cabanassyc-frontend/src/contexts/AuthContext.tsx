@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import tokenMiddleware from '../api/TokenMiddleWare.ts';
+import { loginRequest, fetchUserData } from '../api/Auth';
 import { toast } from 'react-toastify';
-import LoadingScreen from '../components/common/LoadingScreen.tsx';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 interface User {
     id: number;
@@ -27,7 +27,6 @@ export const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -42,13 +41,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const getUser = async (token: string) => {
         try {
-            const {data} = await tokenMiddleware.get('/users/auth', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setUser(data.data);
-            return data.data;
+            const userData = await fetchUserData(token);
+            setUser(userData);
+            return userData;
         } catch (error) {
             console.error('Error fetching user:', error);
             logout();
@@ -59,29 +54,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const login = async (email: string, password: string) => {
         try {
-          const { data } = await tokenMiddleware.post('/auth/login', { email, password });
-      
-          const accessToken = data.data.accessToken;
-          localStorage.setItem('token', accessToken);
-      
-          const user = await getUser(accessToken);
-          console.log("USER OBJETO DESDE EL LOGIN:", user);
-          toast.success(`¡Bienvenido, ${user.name}! 🎉`);
-          if (user.role === "ADMIN") {
-            navigate('/admin/dashboard');
-          } else if (user.role === "WORKER") {
-            navigate('/worker/dashboard');
-          } else if (user.role === "USER") {
-            navigate('/home');
-          } else {
-            navigate('/login'); 
-          }
+            const token = await loginRequest(email, password);
+            localStorage.setItem('token', token);
+            const user = await getUser(token);
+
+            toast.success(`¡Bienvenido, ${user.name}! 🎉`);
+            if (user.role === "ADMIN") {
+                navigate('/admin/dashboard');
+            } else if (user.role === "WORKER") {
+                navigate('/worker/dashboard');
+            } else if (user.role === "USER") {
+                navigate('/home');
+            } else {
+                navigate('/login');
+            }
         } catch (error: any) {
-          console.error('Login error:', error);
-          toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
-          throw new Error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+            console.error('Login error:', error);
+            toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+            throw new Error(error.response?.data?.message || 'Login failed. Please check your credentials.');
         }
-      };
+    };
 
     const logout = () => {
         localStorage.removeItem('token');
@@ -93,5 +85,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         <AuthContext.Provider value={{ user, loading, login, logout, authenticated: !!user }}>
             {loading ? <LoadingScreen /> : children}
         </AuthContext.Provider>
-    )
-}
+    );
+};

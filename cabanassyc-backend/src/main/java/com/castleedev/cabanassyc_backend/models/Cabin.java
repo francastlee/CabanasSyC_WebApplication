@@ -41,6 +41,9 @@ public class Cabin {
     @OneToMany(mappedBy = "cabin")
     private List<CabinBooking> cabinBookingList;
 
+    @OneToMany(mappedBy = "cabin")
+    private List<CabinImage> cabinImagesList;
+
     public Cabin(Long id, String name, CabinType cabinType, boolean state) {
         this.id = id;
         this.name = name;
