@@ -14,7 +14,12 @@ import org.springframework.web.server.ResponseStatusException;
 import com.castleedev.cabanassyc_backend.DAL.ICabinDAL;
 import com.castleedev.cabanassyc_backend.DAL.ICabinTypeDAL;
 import com.castleedev.cabanassyc_backend.DTO.CabinDTO;
+import com.castleedev.cabanassyc_backend.DTO.CabinFullDTO;
+import com.castleedev.cabanassyc_backend.DTO.CabinImageDTO;
+import com.castleedev.cabanassyc_backend.DTO.CabinTypeDTO;
+import com.castleedev.cabanassyc_backend.DTO.EquipmentDTO;
 import com.castleedev.cabanassyc_backend.Models.Cabin;
+import com.castleedev.cabanassyc_backend.Models.CabinImage;
 import com.castleedev.cabanassyc_backend.Models.CabinType;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ICabinService;
 
@@ -59,6 +64,50 @@ public class CabinService implements ICabinService {
 
         return convertToDTO(cabin);
     }
+
+    public List<CabinFullDTO> getAllCabinsWithDetails() {
+        List<Cabin> cabins = cabinDAL.findAllByStateTrue();
+
+        return cabins.stream().map(cabin -> {
+            CabinFullDTO dto = new CabinFullDTO();
+            dto.setId(cabin.getId());
+            dto.setName(cabin.getName());
+            dto.setState(cabin.isState());
+
+            CabinTypeDTO typeDTO = new CabinTypeDTO();
+            typeDTO.setId(cabin.getCabinType().getId());
+            typeDTO.setName(cabin.getCabinType().getName());
+            typeDTO.setCapacity(cabin.getCabinType().getCapacity());
+            typeDTO.setPrice(cabin.getCabinType().getPrice());
+            dto.setCabinType(typeDTO);
+
+            List<EquipmentDTO> equipments = cabin.getCabinEquipmentList().stream()
+                .map(ce -> {
+                    EquipmentDTO e = new EquipmentDTO();
+                    e.setId(ce.getEquipment().getId());
+                    e.setName(ce.getEquipment().getName());
+                    return e;
+                })
+                .toList();
+            dto.setEquipments(equipments);
+
+            List<CabinImageDTO> cabinImages = cabin.getCabinImagesList().stream()
+                .filter(CabinImage::isState)
+                .map(img -> new CabinImageDTO(
+                    img.getId(),
+                    img.getCabin().getId(),
+                    img.getUrl(),
+                    img.isCover(),
+                    img.isState()
+                ))
+                .toList();
+            dto.setCabinImages(cabinImages);
+
+            return dto;
+        }).toList();
+    }
+
+
 
     @Override
     @CacheEvict(value = "cabins", allEntries = true)

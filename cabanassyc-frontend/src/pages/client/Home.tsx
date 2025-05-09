@@ -20,6 +20,7 @@ const Home = () => {
           direccionLink="https://maps.app.goo.gl/vytKdRRS3ERVsnLy8"
           correo="cabanassyc@gmail.com"
           telefono="+506 8543-5358"
+          color="#1a3a17"
           redes={{
             facebook: "https://facebook.com/cabanassyc",
             instagram: "https://instagram.com/cabanas_syc",

@@ -22,7 +22,7 @@ export const AnimatedButton = ({
         className
       )}
     >
-      <span className="block transform transition-transform duration-300 group-hover:translate-x-40 ">
+      <span className="block transform transition-transform duration-300 group-hover:translate-x-100 ">
         {children}
       </span>
       <span className="absolute inset-0 flex items-center justify-center translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ">

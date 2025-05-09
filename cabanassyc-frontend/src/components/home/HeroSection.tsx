@@ -22,7 +22,7 @@ export const HeroSection = () => {
         rel="noopener noreferrer"
         aria-label="Sitio del desarrollador"
       >
-        <AnimatedButton icon={<FaLongArrowAltRight />}>
+        <AnimatedButton icon={<FaLongArrowAltRight />} className="animate-fade-in-up">
           {t("hero.button")}
         </AnimatedButton>
       </a>

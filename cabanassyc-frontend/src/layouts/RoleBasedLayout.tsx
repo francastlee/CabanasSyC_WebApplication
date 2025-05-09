@@ -11,13 +11,11 @@ function RoleBasedLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar diferente según el rol */}
       {user.role === "ADMIN" && <AdminNavbar />}
       {user.role === "WORKER" && <WorkerNavbar />}
       {user.role === "USER" && <ClientNavbar />}
 
-      {/* Contenido principal */}
-      <main className="flex-1 bg-gray-100">
+      <main>
         <Outlet />
       </main>
     </div>
@@ -26,7 +24,6 @@ function RoleBasedLayout() {
 
 export default RoleBasedLayout;
 
-// Componente Navbar de Admin
 const AdminNavbar = () => (
   <nav className="bg-blue-700 text-white p-4 flex justify-between">
     <div>Admin Panel</div>
@@ -34,7 +31,6 @@ const AdminNavbar = () => (
   </nav>
 );
 
-// Componente Navbar de Trabajador
 const WorkerNavbar = () => (
   <nav className="bg-green-700 text-white p-4 flex justify-between">
     <div>Worker Panel</div>
@@ -42,7 +38,6 @@ const WorkerNavbar = () => (
   </nav>
 );
 
-// Componente Navbar de Cliente
 const ClientNavbar = () => (
   <NavbarClient />
 );

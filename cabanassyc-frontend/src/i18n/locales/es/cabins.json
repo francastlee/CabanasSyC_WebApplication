@@ -1,0 +1,32 @@
+{
+    "cabins": {
+        "title": "Nuestras habitaciones"
+    },
+    "cabinCard": {
+        "type": "Tipo",
+        "capacity": "Capacidad",
+        "night": "noche",
+        "people": "personas",
+        "bookNow": "Reservar"
+    },
+    "modal": {
+        "title": "Reservando {{cabin}}",
+        "fullName": "Nombre completo",
+        "checkIn": "Fecha de entrada",
+        "checkOut": "Fecha de salida",
+        "adults": "Cantidad de adultos",
+        "children": "Cantidad de niños",
+        "placeholderName": "Tu nombre",
+        "btn": "Consultar disponibilidad"
+    },
+    "errors": {
+        "required": "Todos los campos son obligatorios.",
+        "futureDate": "La fecha de entrada debe ser hoy o una fecha futura.",
+        "dateOrder": "La fecha de salida debe ser posterior a la de entrada.",
+        "adultMin": "Debe haber al menos un adulto.",
+        "limit": "La cantidad total de personas no debe exceder {{capacity}}."
+    },
+    "messages":{
+        "message": "¡Hola! Me gustaría reservar la {{cabin}}\n\n*Mi nombre es:* {{name}}\nCheck-in: {{checkIn}}\nCheck-out: {{checkOut}}\nAdultos: {{adults}}\nNiños: {{children}}\n\nEnviado desde cabanassyc.com\n¡Quedo atento(a) a su confirmación!"      
+    }
+}
