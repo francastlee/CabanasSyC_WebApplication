@@ -78,15 +78,28 @@ export default function Footer({
         )}
 
         {(correo || telefono) && (
-          <div className="flex items-start gap-4">
-            <FaEnvelope style={{ color: icon }} className="text-xl mt-1" />
-            <div>
-              <h4 className="font-semibold">{t("footer.help")}</h4>
-              {correo && <p className="text-sm">{correo}</p>}
-              {telefono && <p className="text-sm">{telefono}</p>}
-            </div>
+        <div className="flex items-start gap-4">
+          <FaEnvelope style={{ color: icon }} className="text-xl mt-1" />
+          <div>
+            <h4 className="font-semibold">{t("footer.help")}</h4>
+            {correo && (
+              <p className="text-sm">
+                <a href={`mailto:${correo}`} className="hover:underline text-white">
+                  {correo}
+                </a>
+              </p>
+            )}
+            {telefono && (
+              <p className="text-sm">
+                <a href={`tel:${telefono}`} className="hover:underline text-white">
+                  {telefono}
+                </a>
+              </p>
+            )}
           </div>
-        )}
+        </div>
+      )}
+
       </div>
 
       <div

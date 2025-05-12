@@ -14,6 +14,7 @@ import Home from "./pages/client/Home.tsx";
 import Cabins from "./pages/client/Cabins.tsx";
 import { AuthProvider } from "./contexts/AuthContext";
 import './App.css';
+import Tours from "./pages/client/Tours.tsx";
 const App = (): JSX.Element => {
   useAuthInterceptor();
   return (
@@ -30,6 +31,7 @@ const App = (): JSX.Element => {
               <Route path="/home" element={<Home />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/cabins" element={<Cabins />} />
+              <Route path="/tours" element={<Tours />} />
 
               {/* Admin */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
