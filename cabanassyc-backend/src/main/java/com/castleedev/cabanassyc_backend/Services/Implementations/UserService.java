@@ -2,6 +2,8 @@ package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
 
+import javax.management.relation.RoleNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,23 +12,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.castleedev.cabanassyc_backend.DAL.IRolDAL;
 import com.castleedev.cabanassyc_backend.DAL.IUserDAL;
 import com.castleedev.cabanassyc_backend.DTO.CurrentUserDTO;
 import com.castleedev.cabanassyc_backend.DTO.UserDTO;
+import com.castleedev.cabanassyc_backend.DTO.UserRolDTO;
+import com.castleedev.cabanassyc_backend.Models.Rol;
 import com.castleedev.cabanassyc_backend.Models.UserModel;
+import com.castleedev.cabanassyc_backend.Services.Interfaces.IUserRolService;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.IUserService;
 
 @Service
 @Transactional
 public class UserService implements IUserService {
 
+    private final IRolDAL rolDAL;
     private final IUserDAL userDAL;
     private final PasswordEncoder passwordEncoder;
+    private final IUserRolService userRolService;
 
-    public UserService(IUserDAL userDAL, PasswordEncoder passwordEncoder) {
-        this.userDAL = userDAL;
-        this.passwordEncoder = passwordEncoder;
-    }
+    public UserService(IUserDAL userDAL, PasswordEncoder passwordEncoder,
+                   IRolDAL rolDAL, IUserRolService userRolService) {
+    this.userDAL = userDAL;
+    this.passwordEncoder = passwordEncoder;
+    this.rolDAL = rolDAL;
+    this.userRolService = userRolService;
+}
 
     @Override
     @Transactional(readOnly = true)
@@ -65,6 +76,20 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional(readOnly = true)
+    public UserDTO getUserByEmail(String email) {
+        UserModel user = userDAL.findByEmailAndStateTrue(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setEmail(user.getEmail());
+
+        return userDTO;
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         UserModel user = userDAL.findByIdAndStateTrue(id)
             .orElseThrow(() -> new ResponseStatusException(
@@ -73,6 +98,8 @@ public class UserService implements IUserService {
             ));
         return convertToDTO(user);
     }
+
+
 
     @Override
     public UserDTO addUser(UserDTO userDTO) {        
@@ -128,6 +155,52 @@ public class UserService implements IUserService {
             userDTO.getHourlyRate(), 
             userDTO.getState()
         );
+    }
+
+    @Transactional
+    public UserModel upsertGoogleUser(String email, String name, String pictureUrl) {
+        UserModel user = userDAL.findByEmailAndStateTrue(email)
+            .map(existing -> {
+                // opcional: sincronizar nombre
+                if (name != null && !name.isEmpty()) {
+                    String[] parts = name.split(" ", 2);
+                    existing.setFirstName(parts[0]);
+                    if (parts.length > 1) existing.setLastName(parts[1]);
+                }
+                return userDAL.save(existing);
+            })
+            .orElseGet(() -> {
+                // crear usuario nuevo sin password (OAuth2)
+                UserModel u = new UserModel();
+                if (name != null && !name.isEmpty()) {
+                    String[] parts = name.split(" ", 2);
+                    u.setFirstName(parts[0]);
+                    if (parts.length > 1) u.setLastName(parts[1]);
+                }
+                u.setEmail(email);
+                u.setPasswordHashed(""); // sin password local
+                u.setState(true);
+                return userDAL.save(u);
+            });
+
+        // 📌 Asignar rol USER si no lo tiene
+        boolean hasUserRole = user.getUserRolList() != null && 
+                            user.getUserRolList().stream()
+                                .anyMatch(ur -> "USER".equalsIgnoreCase(ur.getRol().getName()));
+
+        if (!hasUserRole) {
+            Rol rolUser = rolDAL.findByNameAndStateTrue("USER")
+                    .orElseThrow(() -> new RuntimeException("Rol USER no encontrado"));
+
+            UserRolDTO userRolDTO = new UserRolDTO();
+            userRolDTO.setUserId(user.getId());
+            userRolDTO.setRolId(rolUser.getId());
+            userRolDTO.setState(true);
+
+            userRolService.addUserRol(userRolDTO);
+        }
+
+        return user;
     }
 
     private void updatePasswordIfChanged(UserModel newUser, UserModel existingUser) {

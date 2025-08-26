@@ -25,6 +25,19 @@ public class JwtGenerator {
             .compact();
     }
 
+    public String generateToken(String email) {
+        return Jwts.builder()
+            .setSubject(email)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.JWT_EXPIRATION))
+            .signWith(
+                Keys.hmacShaKeyFor(SecurityConstants.JWT_SECRET.getBytes(StandardCharsets.UTF_8)),
+                SignatureAlgorithm.HS512
+            )
+            .compact();
+    }
+
+
     public String getEmailFromJWT(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(SecurityConstants.JWT_SECRET.getBytes(StandardCharsets.UTF_8))

@@ -42,22 +42,23 @@ export const CabinCard: FC<Props> = ({ cabin, onReserveClick }) => {
             key={img.id}
             src={img.url}
             alt={cabin.name}
-            className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ${
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${
               index === activeIndex ? "opacity-100" : "opacity-0"
             }`}
           />
         ))}
+        
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-black/60" />
 
         <button
           onClick={prevImage}
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 p-1 rounded-full hover:bg-black/60"
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 p-1 rounded-full hover:bg-black/60 cursor-pointer"
         >
           <FaArrowLeft />
         </button>
         <button
           onClick={nextImage}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 p-1 rounded-full hover:bg-black/60"
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 p-1 rounded-full hover:bg-black/60 cursor-pointer"
         >
           <FaArrowRight />
         </button>

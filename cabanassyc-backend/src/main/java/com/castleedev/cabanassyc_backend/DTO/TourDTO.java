@@ -1,6 +1,7 @@
 package com.castleedev.cabanassyc_backend.DTO;
 
 import java.sql.Time;
+import java.util.List;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -34,4 +35,6 @@ public class TourDTO {
     private Time endTime;
     
     private boolean state;
+
+    private List<TourImageDTO> images;
 }

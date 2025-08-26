@@ -27,7 +27,7 @@ const UserDropdown = () => {
     <div className="relative hidden md:flex" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 text-white ml-4 icon-glow-green"
+        className="flex items-center gap-2 text-white ml-4 icon-glow-green cursor-pointer"
         aria-label="Usuario"
       >
         <FaUserCircle className="text-2xl" />

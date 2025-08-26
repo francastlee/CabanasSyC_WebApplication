@@ -1,0 +1,11 @@
+{
+    "title": "Actividades en la zona",
+    "card": {
+        "capacity": "Capacidad",
+        "schedule": "Horario",
+        "price": "Precio",
+        "person": "persona",
+        "people": "personas",
+        "button": "Reservar"
+    }
+}

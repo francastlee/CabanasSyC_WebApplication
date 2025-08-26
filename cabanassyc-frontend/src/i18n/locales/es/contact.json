@@ -1,0 +1,38 @@
+{
+    "title": "Contáctanos",
+    "cardTitle": "Envíanos tus datos y nos pondremos en contacto contigo",
+    "firstname": "Nombre",
+    "inputFirstname": "Por favor ingresa tu nombre",
+    "lastname": "Apellidos",
+    "inputLastname": "Por favor ingresa tus apellidos",
+    "email": "Email", 
+    "inputEmail": "Por favor ingresa tu email",
+    "phone": "Teléfono",
+    "inputPhone": "Por favor ingresa tu teléfono",
+    "subject": "Tema",
+    "inputSubject": "Selecciona un tema",
+    "message": "Mensaje",
+    "inputMessage": "Escribe tu mensaje aquí",
+    "button": "Enviar",
+    "validation": {
+        "emptyFirstname": "Por favor ingresa tu nombre",
+        "emptyLastname": "Por favor ingresa tus apellidos",
+        "invalidEmail": "Por favor ingresa un correo válido",
+        "invalidPhone": "Por favor ingresa un télefono válido",
+        "emptyMessage": "Por favor ingresa tu mensaje",
+        "formSuccess": "¡Mensaje enviado exitosamente!",
+        "formError": "Error al enviar el mensaje: "
+    },
+    "activities": {
+        "title": "Actividades para hacer en La Fortuna"
+    },
+    "restaurants": {
+        "title": "Restaurantes"
+    },
+    "airports": {
+        "title": "Aeropuertos",
+        "juanSantaMaria": "Aeropuerto Juan Santa María ",
+        "fortuna": "Aeropuerto La Fortuna",
+        "sanCristobal": "Aeropuerto San Cristobal"
+    }
+}

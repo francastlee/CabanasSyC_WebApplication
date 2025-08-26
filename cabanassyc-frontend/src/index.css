@@ -209,3 +209,23 @@ html, body, #root {
 .fade-in {
   animation: fadeIn 0.6s ease-out forwards;
 }
+
+.hoja-animation1 {
+  animation: floatHoja 4s infinite ease-in-out;
+}
+
+.hoja-animation2 {
+  animation: floatHoja2 4s infinite ease-in-out;
+}
+
+@keyframes floatHoja {
+  0%   { transform: translateY(0px) rotate(70deg); }
+  50%  { transform: translateY(0px) rotate(71deg); }
+  100% { transform: translateY(0px) rotate(70deg); }
+}
+
+@keyframes floatHoja2 {
+  0%   { transform: translateY(0px) rotate(60deg); }
+  50%  { transform: translateY(0px) rotate(61deg); }
+  100% { transform: translateY(0px) rotate(60deg); }
+}

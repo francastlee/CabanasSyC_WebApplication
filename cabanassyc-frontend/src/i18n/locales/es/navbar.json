@@ -2,11 +2,16 @@
   "client": {
     "home": "Inicio",
     "rooms": "Cabañas",
-    "tours": "Tours",
+    "tours": "Actividades",
+    "contact": "Contáctanos",
     "facilities": "Instalaciones",
     "profile": "Perfil",
     "logout": "Cerrar sesión",
     "login": "Iniciar sesión",
-    "register": "Registrarse"
+    "register": "Registrarse",
+    "language": {
+      "spanish": "Español",
+      "english": "Inglés"    
+    }
   }
 }

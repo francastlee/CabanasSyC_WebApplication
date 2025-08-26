@@ -15,6 +15,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
+    loginWithToken: (token: string) => Promise<void>;
     logout: () => void;
     authenticated: boolean;
 }
@@ -75,6 +76,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     };
 
+    const loginWithToken = async (token: string) => {
+        try {
+            localStorage.setItem('token', token);
+            const user = await getUser(token);
+
+            toast.success(`¡Bienvenido, ${user.name}! 🎉`);
+            if (user.role === "ADMIN") {
+                navigate('/admin/dashboard');
+            } else if (user.role === "WORKER") {
+                navigate('/worker/dashboard');
+            } else if (user.role === "USER") {
+                navigate('/home');
+            } else {
+                navigate('/login');
+            }
+        } catch (error) {
+            console.error('Google login error:', error);
+            toast.error('Login with Google failed.');
+            logout();
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         setUser(null);
@@ -82,7 +105,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, authenticated: !!user }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, authenticated: !!user, loginWithToken }}>
             {loading ? <LoadingScreen /> : children}
         </AuthContext.Provider>
     );

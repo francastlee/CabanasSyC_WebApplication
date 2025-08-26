@@ -17,7 +17,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
     { name: t("client.home"), path: "/home" },
     { name: t("client.rooms"), path: "/cabins" },
     { name: t("client.tours"), path: "/tours" },
-    { name: t("client.facilities"), path: "/facilities" },
+    { name: t("client.contact"), path: "/contact" },
   ];
 
   if (!isOpen) return null;

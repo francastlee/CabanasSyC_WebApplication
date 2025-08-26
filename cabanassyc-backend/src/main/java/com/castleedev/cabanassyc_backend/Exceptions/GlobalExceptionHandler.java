@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
                                       name, type, value);
 
         return ResponseEntity.badRequest()
-                .body(new ApiResponse<>(false, message, null));
+                .body(new ApiResponse<Void>(false, message, null));
     }
 
 }

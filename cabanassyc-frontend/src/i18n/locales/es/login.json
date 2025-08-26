@@ -1,0 +1,27 @@
+{
+  "title": "Bienvenido a Cabañas SyC",
+  "subtitle": "Por favor inicia sesión",
+  "placeholders": {
+    "email": "Correo electrónico",
+    "password": "Contraseña"
+  },
+  "buttons": {
+    "signIn": "Iniciar sesión",
+    "google": "Google",
+    "instagram": "Instagram"
+  },
+  "options": {
+    "rememberMe": "Recordarme"
+  },
+  "messages": {
+    "loginSuccess": "Inicio de sesión exitoso",
+    "loginError": "Error al iniciar sesión"
+  },
+  "errors": {
+    "invalidEmail": "Correo inválido",
+    "invalidPassword": "La contraseña debe tener al menos 4 caracteres"
+  },
+  "socialLogin": "Inicia sesión con",
+  "or": "O",
+  "noAccount": "¿No tienes una cuenta?"
+}

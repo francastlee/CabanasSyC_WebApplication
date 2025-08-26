@@ -71,7 +71,7 @@ public class CabinController {
     public ResponseEntity<ApiResponse<Void>> deleteCabin(@PathVariable("id") Long id) {
         cabinService.deleteCabin(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Cabin deleted successfully", null)
+            new ApiResponse<Void>(true, "Cabin deleted successfully", null)
         );
     }
 }

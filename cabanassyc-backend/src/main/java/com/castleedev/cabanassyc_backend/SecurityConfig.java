@@ -22,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.castleedev.cabanassyc_backend.Security.CustomUserDetailsService;
+import com.castleedev.cabanassyc_backend.Security.GoogleOAuth2SuccessHandler;
 import com.castleedev.cabanassyc_backend.Security.JwtAuthEntryPoint;
 import com.castleedev.cabanassyc_backend.Security.JwtAuthenticationFilter;
 
@@ -32,15 +33,13 @@ import java.util.List;
 public class SecurityConfig {
 
    private JwtAuthEntryPoint jwtAuthEntryPoint;
-   private CustomUserDetailsService userDetailsService;
 
    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint) {
       this.jwtAuthEntryPoint = jwtAuthEntryPoint;
-      this.userDetailsService = userDetailsService;
    }
    
    @Bean
-   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+   public SecurityFilterChain securityFilterChain(HttpSecurity http, GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler) throws Exception {
       http
             .csrf(AbstractHttpConfigurer::disable)
             .exceptionHandling(exception -> exception
@@ -53,8 +52,10 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-            .anyRequest().authenticated()
-            )
+               .anyRequest().authenticated()
+               )
+            .oauth2Login(oauth2 -> oauth2.successHandler(googleOAuth2SuccessHandler))
+          
             .headers(headers -> headers
                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                .contentSecurityPolicy(csp -> csp

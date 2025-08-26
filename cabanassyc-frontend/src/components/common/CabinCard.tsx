@@ -1,9 +1,7 @@
 "use client";
 
-import { FC } from "react";
-import { DirectionAwareHover } from "../animations/DirectionAwareHover";
+import { FC, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-
 
 interface CabinCardProps {
   title: string;
@@ -16,25 +14,52 @@ export const CabinCard: FC<CabinCardProps> = ({
   title = "Sin título",
   description = "Descripción no disponible",
   imageUrl,
-  alt = "Imagen de la cabaña",
 }) => {
   const { t } = useTranslation();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [maskStyle, setMaskStyle] = useState({});
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const mask = `radial-gradient(circle 200px at ${x}px ${y}px, transparent 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.9) 100%)`;
+
+    setMaskStyle({
+      WebkitMaskImage: mask,
+      maskImage: mask,
+      WebkitMaskRepeat: "no-repeat",
+      maskRepeat: "no-repeat",
+      WebkitMaskSize: "cover",
+      maskSize: "cover",
+      transition: "mask-image 0.4s ease, -webkit-mask-image 0.4s ease",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setMaskStyle({});
+  };
 
   return (
-    <DirectionAwareHover
-      imageUrl={imageUrl}
-      alt={alt}
-      className="group w-[90vw] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative w-100 h-80 rounded-xl overflow-hidden shadow-xl shrink-0 transition-all duration-300 cursor-pointer"
+      style={{
+        backgroundImage: `url(${imageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        ...maskStyle,
+      }}
     >
-      <article className="mx-auto flex flex-col justify-center items-center text-center bg-black/40 px-4 py-6 rounded-xl backdrop-blur-sm w-60 md:w-80 font-noto">
-        <h3 className="text-base sm:text-lg md:text-xl font-bold text-white leading-tight">
-          {t(title)}
-        </h3>
-        <p className="text-sm sm:text-base text-white/80 mt-1 leading-snug">
-          {t(description)}
-        </p>
-      </article>
-    </DirectionAwareHover>
-
+      <div className="absolute inset-0 z-10 flex flex-col justify-center items-center text-center p-4 text-white">
+        <h3 className="text-xl font-bold">{t(title)}</h3>
+        <p className="text-sm mt-2 text-white/80">{t(description)}</p>
+      </div>
+    </div>
   );
 };

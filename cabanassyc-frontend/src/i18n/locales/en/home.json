@@ -20,5 +20,40 @@
     "toursSubtitle": "Explore waterfalls, volcanoes, and more",
     "roomsTitle": "Rooms",
     "roomsSubtitle": "Rustic cabins equipped with all comforts"
+  },
+  "facilities": {
+    "title": "Facilites you will love",
+    "poolTitle": "Illuminated Pool",
+    "poolDescription": "Enjoy a refreshing pool, ideal for day and night, surrounded by nature.",
+    "volcanoTitle": "View of the Arenal Volcano",
+    "volcanoDescription": "Admire the majestic Arenal Volcano from our facilities, an unforgettable natural spectacle.",
+    "kitchenTitle": "Shared Kitchen",
+    "kitchenDescription": "Cook, socialize, and enjoy our ranch, equipped for families and groups.",
+    "button": "See more details",
+    "poolDetails": {
+      "sizeTitle": "Size",
+      "depthTitle": "Depth",
+      "scheduleTitle": "Schedule",
+      "extrasTitle": "Extras",
+      "sizeData": "15m x 8m",
+      "depthData": "1.2m - 2.5m",
+      "scheduleData": "8:00am to 8:00pm"
+    },
+    "volcanoDetails": {
+      "timeTitle": "Best time",
+      "viewPointTitle": "ViewPoint",
+      "extrasTitle": "Extras",
+      "timeData": "Sunrise and sunset",
+      "viewPointData": "Pool",
+      "extrasData": "Available telescopes, geological information"
+    },
+    "kitchenDetails": {
+      "capacityTitle": "Capacity",
+      "equipmentTitle": "Equipment",
+      "amenitiesTitle": "Amenities",
+      "capacityData": "Up to 20 people",
+      "equipmentData": "Full kitchen, grill, refrigerator",
+      "amenitiesData": "Picnic tables, hammocks, playground"
+    }
   }
 }

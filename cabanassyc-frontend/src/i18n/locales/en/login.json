@@ -1,0 +1,27 @@
+{
+  "title": "Welcome to Cabañas SyC",
+  "subtitle": "Please sign in",
+  "placeholders": {
+    "email": "Email",
+    "password": "Password"
+  },
+  "buttons": {
+    "signIn": "Sign in",
+    "google": "Google",
+    "instagram": "Instagram"
+  },
+  "options": {
+    "rememberMe": "Remember me"
+  },
+  "messages": {
+    "loginSuccess": "Login successful",
+    "loginError": "Login failed"
+  },
+  "errors": {
+    "invalidEmail": "Invalid email",
+    "invalidPassword": "Password must be at least 4 characters"
+  },
+  "socialLogin": "Sign in with",
+  "or": "Or",
+  "noAccount": "Don't have an account?"
+}

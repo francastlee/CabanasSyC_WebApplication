@@ -9,6 +9,7 @@ public interface IUserService {
         
     public List<UserDTO> getAllUsers();
     public UserDTO getUserById(Long id);
+    public UserDTO getUserByEmail(String email);
     public UserDTO addUser(UserDTO userDTO);
     public UserDTO updateUser(UserDTO userDTO);
     public CurrentUserDTO getCurrentUser();

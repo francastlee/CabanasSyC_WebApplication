@@ -4,18 +4,20 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../hooks/UseAuth";
 import { useNavigate } from "react-router-dom";
 import SplitText from "../../components/animations/SplitText";
+import LanguageSwitcher from "../../components/navbar/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
+  const { t } = useTranslation("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const { login, authenticated, user } = useAuth();
+  const { login, authenticated, user, loginWithToken } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,15 +30,26 @@ const Login = () => {
 
   useEffect(() => {
     if (authenticated && user) {
-      if (user.role === "ADMIN") {
-        navigate('/admin/dashboard');
-      } else if (user.role === "WORKER") {
-        navigate('/worker/dashboard');
-      } else {
-        navigate('/home');
-      }
+      if (user.role === "ADMIN") navigate("/admin/dashboard");
+      else if (user.role === "WORKER") navigate("/worker/dashboard");
+      else navigate("/home");
     }
   }, [authenticated, user, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    if (!token) return;
+
+    // usa tu AuthContext
+    loginWithToken(token);
+
+    // limpiar el query param
+    const url = new URL(window.location.href);
+    url.searchParams.delete("token");
+    window.history.replaceState({}, document.title, url.toString());
+    // no navegamos aquí; tu AuthContext ya debe navegar según el rol
+  }, [loginWithToken]);
 
   const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
   const validatePassword = (password: string) => password.trim().length >= 4;
@@ -44,37 +57,27 @@ const Login = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
-
-    if (!validateEmail(value)) {
-      setEmailError("Correo inválido.");
-    } else {
-      setEmailError("");
-    }
+    setEmailError(validateEmail(value) ? "" : t("errors.invalidEmail"));
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
-
-    if (!validatePassword(value)) {
-      setPasswordError("Mínimo 4 caracteres.");
-    } else {
-      setPasswordError("");
-    }
+    setPasswordError(validatePassword(value) ? "" : t("errors.invalidPassword"));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setEmailError("Correo inválido.");
-      toast.error("Correo inválido.");
+      setEmailError(t("errors.invalidEmail"));
+      toast.error(t("errors.invalidEmail"));
       return;
     }
 
     if (!validatePassword(password)) {
-      setPasswordError("Mínimo 4 caracteres.");
-      toast.error("La contraseña debe tener al menos 4 caracteres.");
+      setPasswordError(t("errors.invalidPassword"));
+      toast.error(t("errors.invalidPassword"));
       return;
     }
 
@@ -83,48 +86,39 @@ const Login = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 800));
       await login(email, password);
-
-      if (rememberMe) {
-        localStorage.setItem("rememberedEmail", email);
-      } else {
-        localStorage.removeItem("rememberedEmail");
-      }
-
-      toast.success("Inicio de sesión exitoso 🚀");
-    } catch (error) {
-      toast.error("Error al iniciar sesión.");
+      rememberMe
+        ? localStorage.setItem("rememberedEmail", email)
+        : localStorage.removeItem("rememberedEmail");
+      toast.success(t("messages.loginSuccess"));
+    } catch {
+      toast.error(t("messages.loginError"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="flex justify-center items-center w-full min-h-screen bg-cover bg-center p-6 sm:p-8 animate-[swayBackground_5s_ease-in]" style={{ backgroundImage: "url('/imgs/login/bglogin.jpg')" }}>
-      <div className="flex flex-col items-center w-full max-w-md bg-[#4B2A1F]/[.80] rounded-3xl shadow-lg p-6 sm:p-8 animate-fadeIn">
+    <section
+      className="flex justify-center items-center w-full min-h-screen bg-cover bg-center p-6 sm:p-8 animate-[swayBackground_5s_ease-in]"
+      style={{ backgroundImage: "url('/imgs/login/bglogin.jpg')" }}
+    >
+      <div className="absolute top-5 right-20 z-50">
+        <LanguageSwitcher />
+      </div>
 
+      <div className="flex flex-col items-center w-full max-w-md bg-[#4B2A1F]/[.80] rounded-3xl shadow-lg p-6 sm:p-8 animate-fadeIn">
         <a href="/">
-          <img className="w-20 mb-4 hover:scale-110 transition-transform duration-500" src="/imgs/common/logoSyC.png" alt="Logo" />
+          <img
+            className="w-20 mb-4 hover:scale-110 transition-transform duration-500"
+            src="/imgs/common/logoSyC.png"
+            alt="Logo"
+          />
         </a>
 
-        <SplitText 
-          text="Welcome to Cabañas SyC"
-          className="text-[#B28B09] font-serif text-2xl sm:text-3xl mb-6"
-          delay={80}
-          animationFrom={{ opacity: 0, transform: "translate3d(0,20px,0)" }}
-          animationTo={{ opacity: 1, transform: "translate3d(0,0px,0)" }}
-          textAlign="center"
-        />
-        <SplitText 
-          text="Please sign in"
-          className="text-[#B28B09] font-serif text-lg sm:text-lg mb-6"
-          delay={125}
-          animationFrom={{ opacity: 0, transform: "translate3d(0,20px,0)" }}
-          animationTo={{ opacity: 1, transform: "translate3d(0,0px,0)" }}
-          textAlign="center"
-        />
+        <SplitText text={t("title")} className="text-[#B28B09] font-serif text-2xl sm:text-3xl mb-6 select-none" delay={80} />
+        <SplitText text={t("subtitle")} className="text-[#B28B09] font-serif text-lg mb-6 select-none" delay={125} />
 
         <form className="w-full flex flex-col items-center gap-4" onSubmit={handleSubmit}>
-          
           <div className="w-full">
             <div className="relative w-full">
               <span className="absolute inset-y-0 left-0 flex items-center justify-center w-12 bg-[#4B2A1F] rounded-l-full">
@@ -132,21 +126,15 @@ const Login = () => {
               </span>
               <input
                 type="email"
-                aria-label="Email"
+                placeholder={t("placeholders.email")}
                 disabled={loading}
-                required
-                placeholder="Email"
                 value={email}
                 onChange={handleEmailChange}
-                className={`pl-16 pr-4 py-2 w-full rounded-full outline-none text-sm sm:text-base
-                  ${emailError ? 'bg-[#856D5D]/[.80] placeholder-white focus:ring-2 focus:ring-[#B8512D]' : 'bg-[#856D5D]/[.80] placeholder-white focus:ring-2 focus:ring-[#B28B09]'}
-                  text-white transition duration-300
-                `}
+                className={`pl-16 pr-4 py-2 w-full rounded-full outline-none text-sm bg-[#856D5D]/[.80] placeholder-white text-white ${emailError ? "ring-2 ring-[#B8512D]" : "ring-2 ring-[#B28B09]"}`}
+                required
               />
             </div>
-            <p className="text-[#B8512D] text-sm mt-1 min-h-[20px] transition-all">
-              {emailError}
-            </p>
+            <p className="text-[#B8512D] text-sm mt-1 min-h-[20px]">{emailError}</p>
           </div>
 
           <div className="w-full">
@@ -156,48 +144,40 @@ const Login = () => {
               </span>
               <input
                 type={showPassword ? "text" : "password"}
-                aria-label="Password"
+                placeholder={t("placeholders.password")}
                 disabled={loading}
-                required
-                placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
-                className={`pl-16 pr-10 py-2 w-full rounded-full outline-none text-sm sm:text-base
-                  ${passwordError ? 'bg-[#856D5D]/[.80] placeholder-white focus:ring-2 focus:ring-[#B8512D]' : 'bg-[#856D5D]/[.80] placeholder-white focus:ring-2 focus:ring-[#B28B09]'}
-                  text-white transition duration-300
-                `}
+                className={`pl-16 pr-10 py-2 w-full rounded-full outline-none text-sm bg-[#856D5D]/[.80] placeholder-white text-white ${passwordError ? "ring-2 ring-[#B8512D]" : "ring-2 ring-[#B28B09]"}`}
+                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(prev => !prev)}
-                className="absolute inset-y-0 right-3 flex items-center text-white hover:text-yellow-300"
-                tabIndex={-1}
+                className="absolute inset-y-0 right-3 flex items-center text-white hover:text-yellow-300 cursor-pointer"
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
             </div>
-            <p className="text-[#B8512D] text-sm mt-1 min-h-[20px] transition-all">
-              {passwordError}
-            </p>
+            <p className="text-[#B8512D] text-sm mt-1 min-h-[20px]">{passwordError}</p>
           </div>
 
-          <div className="flex items-center w-full justify-start gap-2 text-white text-sm mt-2">
+          <div className="flex items-center w-full justify-start gap-2 text-white text-sm select-none">
             <input
               type="checkbox"
               id="rememberMe"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="accent-yellow-400"
+              className="accent-yellow-400 cursor-pointer"
               disabled={loading}
             />
-            <label htmlFor="rememberMe">Recordarme</label>
+            <label htmlFor="rememberMe">{t("options.rememberMe")}</label>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            aria-label="Sign in"
-            className="rounded-full bg-[#856D5D] py-2 px-6 text-white w-1/2 hover:bg-[#6c5247] transition duration-300 text-sm sm:text-base mt-2"
+            className="rounded-full bg-[#856D5D] py-2 px-6 text-white w-1/2 hover:bg-[#6c5247] transition mt-2 text-sm select-none cursor-pointer"
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -206,36 +186,36 @@ const Login = () => {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
               </div>
-            ) : "Sign in"}
+            ) : t("buttons.signIn")}
           </button>
-
         </form>
 
         <div className="flex items-center my-6 w-full">
           <div className="h-[1px] w-full bg-white"></div>
-          <span className="mx-2 sm:mx-4 text-white text-sm sm:text-base">Or</span>
+          <span className="mx-2 text-white text-sm select-none">{t("or")}</span>
           <div className="h-[1px] w-full bg-white"></div>
         </div>
 
-        <span className="text-white mb-4 text-sm sm:text-base">Sign in with</span>
+        <span className="text-white mb-4 text-sm select-none">{t("socialLogin")}</span>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a href="/oauth2/authorization/google" className="flex items-center bg-[#856D5D] rounded-full py-2 px-6 overflow-hidden w-full sm:w-40 hover:bg-[#6c5247] transition">
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <a href="http://localhost:8080/oauth2/authorization/google" className="flex items-center bg-[#856D5D] rounded-full py-2 px-6 w-full hover:bg-[#6c5247] transition select-none">
             <FaGoogle className="text-white" />
-            <span className="text-white flex-grow px-2 text-center text-sm sm:text-base">Google</span>
+            <span className="text-white flex-grow px-2 text-center text-sm">{t("buttons.google")}</span>
           </a>
 
-          <button className="flex items-center bg-[#856D5D] rounded-full py-2 px-6 overflow-hidden w-full sm:w-40 hover:bg-[#6c5247] transition">
+          <button className="flex items-center bg-[#856D5D] rounded-full py-2 px-6 w-full hover:bg-[#6c5247] transition select-none cursor-pointer">
             <FaInstagram className="text-white" />
-            <span className="text-white flex-grow px-2 text-center text-sm sm:text-base">Instagram</span>
+            <span className="text-white flex-grow px-2 text-center text-sm">{t("buttons.instagram")}</span>
           </button>
         </div>
 
-        <span className="text-white mt-8 text-xs sm:text-sm">Don't have an account?</span>
-
+        <span className="text-white mt-8 text-xs hover:text-[#B28B09] cursor-pointer select-none">
+          {t("noAccount")}
+        </span>
       </div>
     </section>
   );
 };
 
-export default Login;
+export default Login; 

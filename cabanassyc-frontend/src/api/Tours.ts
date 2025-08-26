@@ -8,7 +8,14 @@ export interface Tour {
   startTime: string;
   endTime: string;
   state: boolean;
+  images: {
+    id: number;
+    url: string;
+    isCover: boolean;
+    state: boolean;
+  }[];
 }
+
 
 export const getTours = async (): Promise<Tour[]> => {
   const response = await tokenMiddleware.get("/tours");

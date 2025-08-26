@@ -63,7 +63,7 @@ public class WorkingDayController {
     public ResponseEntity<ApiResponse<Void>> deleteWorkingDay(@PathVariable("id") Long id) {
         workingDayService.deleteWorkingDay(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Working day deleted successfully", null)
+            new ApiResponse<Void>(true, "Working day deleted successfully", null)
         );
     }
 }

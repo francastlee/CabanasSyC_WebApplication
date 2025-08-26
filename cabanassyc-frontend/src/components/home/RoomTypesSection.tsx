@@ -15,7 +15,7 @@ const RoomTypesSection = () => {
 
       
       <div className="relative z-10 flex flex-col items-center w-full max-w-7xl mx-auto">
-        <h2 className="text-white text-4xl md:text-6xl font-cinzel text-center mb-10 font-semibold text-glow-brown leading-tight">
+        <h2 className="text-white text-4xl md:text-6xl font-cinzel text-center mb-10  text-glow-brown leading-tight">
           {t("roomTypes.title")}
         </h2>
 
@@ -33,7 +33,7 @@ const RoomTypesSection = () => {
             <CabinCard
               title={t("roomTypes.subtitletTripleRoom")}
               description={t("roomTypes.descriptionTripleRoom")}
-              imageUrl="/imgs/home/cabin2.jpg"
+              imageUrl="/imgs/home/cabin2.webp"
             />
           </AnimatedContent>
 
@@ -50,7 +50,7 @@ const RoomTypesSection = () => {
             <CabinCard
               title={t("roomTypes.subtitleDobleRoom")}
               description={t("roomTypes.descriptionDobleRoom")}
-              imageUrl="/imgs/home/cabin2.jpg"
+              imageUrl="/imgs/home/cabin2.webp"
             />
           </AnimatedContent>
         </div>

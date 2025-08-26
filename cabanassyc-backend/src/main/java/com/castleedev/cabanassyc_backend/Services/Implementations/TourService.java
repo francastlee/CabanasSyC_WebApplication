@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.castleedev.cabanassyc_backend.DAL.ITourDAL;
+import com.castleedev.cabanassyc_backend.DAL.ITourImageDAL;
 import com.castleedev.cabanassyc_backend.DTO.TourDTO;
+import com.castleedev.cabanassyc_backend.DTO.TourImageDTO;
 import com.castleedev.cabanassyc_backend.Models.Tour;
 import com.castleedev.cabanassyc_backend.Services.Interfaces.ITourService;
 
@@ -18,10 +20,12 @@ import com.castleedev.cabanassyc_backend.Services.Interfaces.ITourService;
 public class TourService implements ITourService {
     
     private final ITourDAL tourDAL;
+    private final ITourImageDAL tourImageDAL;
 
-    public TourService(ITourDAL tourDAL) {
-        this.tourDAL = tourDAL;
-    }
+    public TourService(ITourDAL tourDAL, ITourImageDAL tourImageDAL) {
+    this.tourDAL = tourDAL;
+    this.tourImageDAL = tourImageDAL;
+}
 
     @Override
     @Transactional(readOnly = true)
@@ -97,15 +101,21 @@ public class TourService implements ITourService {
 
     private TourDTO convertToDTO(Tour tour) {
         if (tour == null) return null;
-        
+
+        List<TourImageDTO> images = tourImageDAL.findAllByTourIdAndStateTrue(tour.getId())
+            .stream()
+            .map(image -> new TourImageDTO(image.getUrl(), image.isCover()))
+            .collect(Collectors.toList());
+
         return new TourDTO(
-            tour.getId(), 
-            tour.getName(), 
-            tour.getCapacity(), 
-            tour.getPrice(), 
-            tour.getStartTime(), 
-            tour.getEndTime(), 
-            tour.isState()
+            tour.getId(),
+            tour.getName(),
+            tour.getCapacity(),
+            tour.getPrice(),
+            tour.getStartTime(),
+            tour.getEndTime(),
+            tour.isState(),
+            images
         );
     }
 
