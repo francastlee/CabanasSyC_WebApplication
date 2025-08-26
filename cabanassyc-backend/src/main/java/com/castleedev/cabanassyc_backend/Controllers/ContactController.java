@@ -62,7 +62,7 @@ public class ContactController {
     public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable("id") Long id) {
         contactService.deleteContact(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Contact deleted successfully", null)
+            new ApiResponse<Void>(true, "Contact deleted successfully", null)
         );
     }
 }

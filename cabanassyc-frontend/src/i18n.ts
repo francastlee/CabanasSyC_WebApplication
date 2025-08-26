@@ -13,6 +13,16 @@ import footerES from './i18n/locales/es/footer.json';
 import cabinsEN from './i18n/locales/en/cabins.json';
 import cabinsES from './i18n/locales/es/cabins.json';
 
+import contactEN from './i18n/locales/en/contact.json';
+import contactES from './i18n/locales/es/contact.json';
+
+import toursEN from './i18n/locales/en/tours.json';
+import toursES from './i18n/locales/es/tours.json';
+
+import loginEN from './i18n/locales/en/login.json';
+import loginES from './i18n/locales/es/login.json';
+
+
 i18n
   .use(initReactI18next)
   .init({
@@ -21,19 +31,25 @@ i18n
         home: homeEN,
         navbar: navbarEN,
         footer: footerEN,
-        cabins: cabinsEN
+        cabins: cabinsEN,
+        contact: contactEN,
+        tours: toursEN,
+        login: loginEN
       },
       es: {
         home: homeES,
         navbar: navbarES,
         footer: footerES,
-        cabins: cabinsES
+        cabins: cabinsES,
+        contact: contactES,
+        tours: toursES,
+        login: loginES
       },
     },
     lng: 'es',
     fallbackLng: 'es',
     defaultNS: 'home', 
-    ns: ['home', 'navbar', 'footer', 'cabins'], 
+    ns: ['home', 'navbar', 'footer', 'cabins', 'contact', 'tours'], 
     interpolation: {
       escapeValue: false,
     },

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    image: cabanassyc-backend
+    container_name: cabanassyc-api
+    build:
+      context: ./cabanassyc-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/cabanassyc
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - db
+    networks:
+      - cabanassyc-network
+
+  db:
+    image: postgres:15
+    container_name: cabanassyc-db
+    environment:
+      POSTGRES_DB: cabanassyc
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - cabanassyc-network
+
+volumes:
+  postgres_data:
+
+networks:
+  cabanassyc-network:

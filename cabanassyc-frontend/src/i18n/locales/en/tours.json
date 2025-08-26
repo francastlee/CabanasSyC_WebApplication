@@ -1,0 +1,11 @@
+{
+    "title": "Activities in the area",
+    "card": {
+        "capacity": "Capacity",
+        "schedule": "Schedule",
+        "price": "Price",
+        "person": "person",
+        "people": "people",
+        "button": "Book"
+    }
+}

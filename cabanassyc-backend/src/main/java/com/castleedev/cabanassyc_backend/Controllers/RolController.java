@@ -63,7 +63,7 @@ public class RolController {
     public ResponseEntity<ApiResponse<Void>> deleteRol(@PathVariable("id") Long id) {
         rolService.deleteRol(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Role deleted successfully", null)
+            new ApiResponse<Void>(true, "Role deleted successfully", null)
         );
     }
 }

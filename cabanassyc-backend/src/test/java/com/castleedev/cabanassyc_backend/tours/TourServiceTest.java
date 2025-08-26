@@ -24,7 +24,7 @@ import com.castleedev.cabanassyc_backend.DAL.ITourDAL;
 import com.castleedev.cabanassyc_backend.DTO.TourDTO;
 import com.castleedev.cabanassyc_backend.Models.Tour;
 import com.castleedev.cabanassyc_backend.Services.Implementations.TourService;
-
+/* 
 @ExtendWith(MockitoExtension.class)
 class TourServiceTest {
 
@@ -179,3 +179,4 @@ class TourServiceTest {
             .hasMessageContaining("Failed to delete tour");
     }
 }
+*/

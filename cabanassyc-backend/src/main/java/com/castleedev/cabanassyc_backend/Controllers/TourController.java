@@ -63,7 +63,7 @@ public class TourController {
     public ResponseEntity<ApiResponse<Void>> deleteTour(@PathVariable("id") Long id) {
         tourService.deleteTour(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Tour deleted successfully", null)
+            new ApiResponse<Void>(true, "Tour deleted successfully", null)
         );
     }
 }

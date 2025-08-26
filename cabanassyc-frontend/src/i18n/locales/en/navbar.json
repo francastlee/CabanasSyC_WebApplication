@@ -3,10 +3,15 @@
     "home": "Home",
     "rooms": "Cabins",
     "tours": "Tours",
+    "contact": "Contact us",
     "facilities": "Facilities",
     "profile": "Profile",
     "logout": "Logout",
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "language": {
+      "spanish": "Spanish",
+      "english": "English"    
+    }
   }
 }

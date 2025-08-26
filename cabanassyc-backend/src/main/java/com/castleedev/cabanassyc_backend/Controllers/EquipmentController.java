@@ -63,7 +63,7 @@ public class EquipmentController {
     public ResponseEntity<ApiResponse<Void>> deleteEquipment(@PathVariable("id") Long id) {
         equipmentService.deleteEquipment(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Equipment deleted successfully", null)
+            new ApiResponse<Void>(true, "Equipment deleted successfully", null)
         );
     }
 }

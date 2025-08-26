@@ -3,8 +3,10 @@ package com.castleedev.cabanassyc_backend.Models;
 import java.sql.Time;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +34,9 @@ public class Tour {
     private Time startTime;
     private Time endTime;
     boolean state;
+
+    @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TourImage> images;
 
     @OneToMany(mappedBy = "tour")
     private List<BookingTour> bookingTourList;

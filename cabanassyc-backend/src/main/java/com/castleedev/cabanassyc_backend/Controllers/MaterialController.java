@@ -63,7 +63,7 @@ public class MaterialController {
     public ResponseEntity<ApiResponse<Void>> deleteMaterial(@PathVariable("id") Long id) {
         materialService.deleteMaterial(id);
         return ResponseEntity.ok(
-            new ApiResponse<>(true, "Material deleted successfully", null)
+            new ApiResponse<Void>(true, "Material deleted successfully", null)
         );
     }
 }

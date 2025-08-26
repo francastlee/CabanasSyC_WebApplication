@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,6 +15,7 @@ import Cabins from "./pages/client/Cabins.tsx";
 import { AuthProvider } from "./contexts/AuthContext";
 import './App.css';
 import Tours from "./pages/client/Tours.tsx";
+import Contact from "./pages/client/Contact.tsx";
 const App = (): JSX.Element => {
   useAuthInterceptor();
   return (
@@ -24,7 +25,7 @@ const App = (): JSX.Element => {
           <Routes>
             {/* Página de Login */}
             <Route path="/login" element={<Login />} />
-            
+            <Route path="/" element={<Navigate to="/home" replace />} />
             {/* Rutas protegidas */}
             <Route element={<ProtectedRoute rolesAlloweds={["ADMIN", "WORKER", "USER"]} />}>
               <Route element={<RoleBasedLayout />}>
@@ -32,6 +33,7 @@ const App = (): JSX.Element => {
               <Route path="/perfil" element={<Profile />} />
               <Route path="/cabins" element={<Cabins />} />
               <Route path="/tours" element={<Tours />} />
+              <Route path="/contact" element={<Contact />} />
 
               {/* Admin */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />

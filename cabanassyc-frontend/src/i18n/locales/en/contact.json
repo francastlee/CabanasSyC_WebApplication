@@ -1,0 +1,38 @@
+{
+    "title": "Contact Us",
+    "cardTitle": "Send us your details and we'll contact you",
+    "firstname": "Your firstname",
+    "inputFirstname": "Please enter your firstname",
+    "lastname": "Your lastname",
+    "inputLastname": "Please enter your lastname",
+    "email": "Your email", 
+    "inputEmail": "Please enter your email",
+    "phone": "Your phone",
+    "inputPhone": "Please enter your phone",
+    "subject": "Subject",
+    "inputSubject": "Select subject",
+    "message": "Messsage",
+    "inputMessage": "Write your message here",
+    "button": "Send",
+    "validation": {
+        "emptyFirstname": "Please enter your firstname",
+        "emptyLastname": "Please enter your lastname",
+        "invalidEmail": "Please enter a valid email",
+        "invalidPhone": "Please enter a valid phone",
+        "emptyMessage": "Please enter your message",
+        "formSuccess": "Message sent succesfully!",
+        "formError": "Error sending message: "
+    },
+    "activities": {
+        "title": "Activities to do in La Fortuna"
+    },
+    "restaurants": {
+        "title": "Restaurants"
+    },
+    "airports": {
+        "title": "Airports",
+        "juanSantaMaria": "Juan Santa María Airport",
+        "fortuna": "La Fortuna Airport",
+        "sanCristobal": "San Cristobal Airport"
+    }
+}
