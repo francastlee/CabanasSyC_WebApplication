@@ -5,7 +5,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from "./pages/auth/Login";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import Profile from "./pages/common/Profile.tsx";
-//import NoAuthorized from "./pages/auth/NoAuthorized";
 import { JSX } from "react";
 import { useAuthInterceptor } from "./hooks/UseAuthInterceptor.tsx";
 import RoleBasedLayout from "./layouts/RoleBasedLayout.tsx";
@@ -16,37 +15,47 @@ import { AuthProvider } from "./contexts/AuthContext";
 import './App.css';
 import Tours from "./pages/client/Tours.tsx";
 import Contact from "./pages/client/Contact.tsx";
+import Register from "./pages/auth/Register.tsx";
+import NoAuthorized from "./pages/common/NoAuthorized.tsx";
+import NotFound from "./pages/common/NotFound.tsx";
+
 const App = (): JSX.Element => {
   useAuthInterceptor();
   return (
     <>
-    <BrowserRouter>
-      <AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
           <Routes>
-            {/* Página de Login */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            {/* Rutas protegidas */}
-            <Route element={<ProtectedRoute rolesAlloweds={["ADMIN", "WORKER", "USER"]} />}>
-              <Route element={<RoleBasedLayout />}>
+            <Route element={<RoleBasedLayout />}>
+              {/* public */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={<Home />} />
-              <Route path="/perfil" element={<Profile />} />
               <Route path="/cabins" element={<Cabins />} />
               <Route path="/tours" element={<Tours />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/no-authorized" element={<NoAuthorized />} />
+              <Route path="*" element={<NotFound />} />
+              {/* protected: profile for any authenticated role */}
+              <Route element={<ProtectedRoute rolesAlloweds={["ADMIN","WORKER","USER"]} />}>
+                <Route path="/perfil" element={<Profile />} />
+              </Route>
 
-              {/* Admin */}
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              {/* protected: admin only */}
+              <Route element={<ProtectedRoute rolesAlloweds={["ADMIN"]} />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              </Route>
 
-              {/* Trabajador */}
-              <Route path="/worker/dashboard" element={<WorkerDashboard />} />
-
-                  {/* Otras rutas aquí */}
+              {/* protected: worker only */}
+              <Route element={<ProtectedRoute rolesAlloweds={["WORKER"]} />}>
+                <Route path="/worker/dashboard" element={<WorkerDashboard />} />
               </Route>
             </Route>
           </Routes>
         </AuthProvider>
       </BrowserRouter>
+
       <ToastContainer 
         position="top-right"
         autoClose={3000}

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ rolesAlloweds }: ProtectedRouteProps) => {
   const { user, loading, authenticated } = useContext(AuthContext);
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -18,11 +19,18 @@ const ProtectedRoute = ({ rolesAlloweds }: ProtectedRouteProps) => {
   }
 
   if (!authenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  if (!rolesAlloweds.includes(user?.role || "")) {
-    return <Navigate to="/no-autorizado" />;
+  const role = user?.role || "";
+  if (!rolesAlloweds.includes(role)) {
+    return (
+      <Navigate
+        to="/no-authorized"
+        replace
+        state={{ from: location.pathname }}
+      />
+    );
   }
 
   return <Outlet />;

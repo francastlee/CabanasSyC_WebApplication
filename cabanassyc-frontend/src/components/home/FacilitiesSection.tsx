@@ -1,214 +1,243 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+  memo,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-
 
 interface Feature {
   title: string;
   description: string;
   sectionKey: string;
-  images: string[]; 
-  direction: string;
+  images: string[];
+  direction: "left" | "right";
   icon: string;
-  details: string [];
+  details: string[];
 }
 
-export default function FacilitiesSection() {
-  
-  const { t } = useTranslation("home"); 
+const FeatureCarousel = memo(function FeatureCarousel({
+  images,
+}: {
+  images: string[];
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const timerRef = useRef<number | null>(null);
 
-const features: Feature[] = [
-  {
-    title:  t("facilities.poolTitle"),
-    description: t("facilities.poolDescription"),
-    sectionKey: "poolDetails",
-    images: ["/imgs/home/pool.webp", "/imgs/home/pool2.webp", "/imgs/home/pool3.webp"],
-    direction: "right",
-    icon: "💡",
-    details: ["size", "depth", "schedule", "extras"]
-  },
-  {
-    title: t("facilities.volcanoTitle"),
-    description: t("facilities.volcanoDescription"),
-    sectionKey: "volcanoDetails",
-    images: ["/imgs/home/volcano.webp", "/imgs/home/volcano2.webp", "/imgs/home/volcano3.webp"],
-    direction: "left",
-    icon: "🌋",
-    details: ["time", "viewPoint", "extras"]
-  },
-  {
-    title: t("facilities.kitchenTitle"),
-    description: t("facilities.kitchenDescription"),
-    sectionKey: "kitchenDetails",
-    images: ["/imgs/home/ranch.webp", "/imgs/home/ranch2.webp", "/imgs/home/ranch3.webp"],
-    direction: "right",
-    icon: "🍴",
-    details: ["capacity", "equipment", "amenities"]
-  }
-];
-
-
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0
-  });
+  const clearTimer = () => {
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
+    if (!isPlaying) return;
+    clearTimer();
+    timerRef.current = window.setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return clearTimer;
+  }, [isPlaying, images.length]);
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+  const pauseThenResume = useCallback((ms = 10000) => {
+    setIsPlaying(false);
+    const id = window.setTimeout(() => setIsPlaying(true), ms);
+    return () => window.clearTimeout(id);
   }, []);
 
-  const isDesktop = windowSize.width >= 1024;
-  const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
+  const goToNext = useCallback(() => {
+    setCurrentIndex((p) => (p + 1) % images.length);
+    pauseThenResume();
+  }, [images.length, pauseThenResume]);
 
+  const goToPrev = useCallback(() => {
+    setCurrentIndex((p) => (p - 1 + images.length) % images.length);
+    pauseThenResume();
+  }, [images.length, pauseThenResume]);
+
+  const goToImage = useCallback(
+    (index: number) => {
+      setCurrentIndex(index);
+      pauseThenResume();
+    },
+    [pauseThenResume]
+  );
+
+  const currentImage = images[currentIndex];
+
+  return (
+    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+      <div className="w-full h-full">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentImage}
+            src={currentImage}
+            alt={`Imagen ${currentIndex + 1}`}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            loading="lazy"
+            decoding="async"
+          />
+        </AnimatePresence>
+      </div>
+
+      <div className="absolute inset-0 flex items-center justify-between p-2">
+        <button
+          onClick={goToPrev}
+          className="bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-all transform hover:scale-110 z-10 cursor-pointer"
+          aria-label="Imagen anterior"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={goToNext}
+          className="bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-all transform hover:scale-110 z-10 cursor-pointer"
+          aria-label="Imagen siguiente"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToImage(index)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              currentIndex === index
+                ? "bg-yellow-400 w-4"
+                : "bg-white/50 hover:bg-white/70 cursor-pointer"
+            }`}
+            aria-label={`Ir a imagen ${index + 1}`}
+          />
+        ))}
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+    </div>
+  );
+});
+
+export default function FacilitiesSection() {
+  const { t, i18n } = useTranslation("home");
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  const [width, setWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  const isDesktop = width >= 1024;
+  const isTablet = width >= 768 && width < 1024;
+
+  const features: Feature[] = useMemo(
+    () => [
+      {
+        title: t("facilities.poolTitle"),
+        description: t("facilities.poolDescription"),
+        sectionKey: "poolDetails",
+        images: ["/imgs/home/pool.webp", "/imgs/home/pool2.webp", "/imgs/home/pool3.webp"],
+        direction: "right",
+        icon: "💡",
+        details: ["size", "depth", "schedule", "extras"],
       },
       {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.1,
-      }
+        title: t("facilities.volcanoTitle"),
+        description: t("facilities.volcanoDescription"),
+        sectionKey: "volcanoDetails",
+        images: ["/imgs/home/volcano.webp", "/imgs/home/volcano2.webp", "/imgs/home/volcano3.webp"],
+        direction: "left",
+        icon: "🌋",
+        details: ["time", "viewPoint", "extras"],
+      },
+      {
+        title: t("facilities.kitchenTitle"),
+        description: t("facilities.kitchenDescription"),
+        sectionKey: "kitchenDetails",
+        images: ["/imgs/home/ranch.webp", "/imgs/home/ranch2.webp", "/imgs/home/ranch3.webp"],
+        direction: "right",
+        icon: "🍴",
+        details: ["capacity", "equipment", "amenities"],
+      },
+    ],
+    [i18n.language, t]
+  );
+
+  const [isVisible, setIsVisible] = useState(false);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { root: null, rootMargin: "0px", threshold: 0.1 }
     );
-
-    const currentSection = sectionRef.current;
-    if (currentSection) {
-      observer.observe(currentSection);
-    }
-
-    return () => {
-      if (currentSection) {
-        observer.unobserve(currentSection);
-      }
-    };
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
+  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+    const onDown = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
         setSelectedFeature(null);
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  const FeatureCarousel = ({ images }: { images: string[] }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(true);
-    const carouselRef = useRef<HTMLDivElement>(null);
+  const getContainerVariants = (index: number, fromRight: boolean) => ({
+    hidden: { opacity: 0, x: fromRight ? 150 : -150, rotate: fromRight ? 2 : -2 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      rotate: 0,
+      transition: { duration: 0.8, delay: index * 0.3, ease: [0.16, 1, 0.3, 1] },
+    },
+  });
 
-    useEffect(() => {
-      if (!isPlaying) return;
-      
-      const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % images.length);
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }, [isPlaying, images.length]);
-
-    const goToNext = () => {
-      setIsPlaying(false);
-      setCurrentIndex((prev) => (prev + 1) % images.length);
-      setTimeout(() => setIsPlaying(true), 10000);
-    };
-
-    const goToPrev = () => {
-      setIsPlaying(false);
-      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-      setTimeout(() => setIsPlaying(true), 10000);
-    };
-
-    const goToImage = (index: number) => {
-      setIsPlaying(false);
-      setCurrentIndex(index);
-      setTimeout(() => setIsPlaying(true), 10000);
-    };
-
-    return (
-      <div className="relative w-full h-full rounded-2xl overflow-hidden">
-        <div ref={carouselRef} className="w-full h-full">
-          <AnimatePresence>
-            {images.map((image, index) => (
-              currentIndex === index && (
-                <motion.img
-                  key={image}
-                  src={image}
-                  alt={`Imagen ${index + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                />
-              )
-            ))}
-          </AnimatePresence>
-        </div>
-
-        <div className="absolute inset-0 flex items-center justify-between p-2">
-          <button
-            onClick={goToPrev}
-            className="bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-all transform hover:scale-110 z-10 cursor-pointer"
-            aria-label="Imagen anterior"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button
-            onClick={goToNext}
-            className="bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-all transform hover:scale-110 z-10 cursor-pointer"
-            aria-label="Imagen siguiente"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToImage(index)}
-              className={`w-2 h-2 rounded-full transition-all ${currentIndex === index ? 'bg-yellow-400 w-4' : 'bg-white/50 hover:bg-white/70 cursor-pointer'}`}
-              aria-label={`Ir a imagen ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-      </div>
-    );
-  };
+  const imageVariants = {
+    hidden: { scale: 0.9, opacity: 0 },
+    visible: { scale: 1, opacity: 1, transition: { duration: 0.6 } },
+  } as const;
 
   return (
     <section
+      id="facilities"
       ref={sectionRef}
       className="w-full bg-[#1a3a17] pb-50 pt-20 px-4 flex flex-col items-center gap-16 relative overflow-hidden select-none"
     >
-
       <motion.h2
-        className="text-white text-4xl md:text-5xl font-cinzel font-bold text-center relative"
+        className="text-white text-4xl md:text-5xl font-cinzel font-bold text-center relative text-glow-brown"
         initial={{ opacity: 0, y: 20 }}
         animate={isVisible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
@@ -219,53 +248,20 @@ const features: Feature[] = [
       <div className="flex flex-col gap-16 md:gap-28 max-w-6xl w-full relative z-10">
         {features.map((feature, index) => {
           const fromRight = feature.direction === "right";
-
-          const containerVariants = {
-            hidden: { 
-              opacity: 0, 
-              x: fromRight ? 150 : -150,
-              rotate: fromRight ? 2 : -2 
-            },
-            visible: {
-              opacity: 1,
-              x: 0,
-              rotate: 0,
-              transition: {
-                duration: 0.8,
-                delay: index * 0.3,
-                ease: [0.16, 1, 0.3, 1],
-              },
-            },
-          };
-
-          const imageVariants = {
-            hidden: { scale: 0.9, opacity: 0 },
-            visible: {
-              scale: 1,
-              opacity: 1,
-              transition: {
-                duration: 0.6,
-                delay: index * 0.3 + 0.2,
-              },
-            },
-          };
-
           return (
             <motion.div
-              key={feature.title}
-              className={`flex flex-col-reverse ${isDesktop ? 'md:flex-row' : ''} items-center gap-8 md:gap-14 ${
+              key={feature.sectionKey}
+              className={`flex flex-col-reverse ${isDesktop ? "md:flex-row" : ""} items-center gap-8 md:gap-14 ${
                 !fromRight && isDesktop ? "md:flex-row-reverse" : ""
               }`}
               initial="hidden"
               animate={isVisible ? "visible" : "hidden"}
-              variants={containerVariants}
+              variants={getContainerVariants(index, fromRight)}
             >
-              <motion.div 
-                className={`
-                  relative 
-                  ${isDesktop ? 'md:w-1/2 h-[500px]' : isTablet ? 'w-full h-[350px]' : 'w-full aspect-video'}
-                  rounded-2xl overflow-hidden shadow-2xl
-                `}
+              <motion.div
+                className={`relative ${
+                  isDesktop ? "md:w-1/2 h-[500px]" : isTablet ? "w-full h-[350px]" : "w-full aspect-video"
+                } rounded-2xl overflow-hidden shadow-2xl`}
                 whileHover={{ y: isDesktop ? -10 : 0 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 variants={imageVariants}
@@ -273,20 +269,15 @@ const features: Feature[] = [
                 <FeatureCarousel images={feature.images} />
               </motion.div>
 
-              <motion.div 
-                className={`
-                  ${isDesktop ? 'md:w-1/2' : 'w-full'}
-                  ${isDesktop ? '' : 'mt-6'}
-                `}
+              <motion.div
+                className={`${isDesktop ? "md:w-1/2" : "w-full"} ${isDesktop ? "" : "mt-6"}`}
                 initial={{ opacity: 0 }}
                 animate={isVisible ? { opacity: 1 } : {}}
                 transition={{ delay: index * 0.3 + 0.4 }}
               >
-                <div className={`
-                  bg-white/5 backdrop-blur-sm 
-                  ${isDesktop ? 'p-8' : 'p-6'} 
-                  rounded-2xl border border-white/10 shadow-lg
-                `}>
+                <div
+                  className={`bg-white/5 backdrop-blur-sm ${isDesktop ? "p-8" : "p-6"} rounded-2xl border border-white/10 shadow-lg`}
+                >
                   <div className="text-4xl mb-4">{feature.icon}</div>
                   <h3 className="text-2xl md:text-3xl font-bold mb-4 font-cinzel text-white">
                     {feature.title}
@@ -309,23 +300,29 @@ const features: Feature[] = [
         })}
       </div>
 
-      <img 
-          src="/imgs/home/frog.webp" 
-          alt="Rana de ojos rojos" 
-          className="absolute xl:top-58 top-33 xl:left-64 left-0 w-20 xl:w-48 z-20 pointer-events-none"
-        />
-        <img 
-          src="/imgs/home/hoja.webp" 
-          alt="Rana de ojos rojos" 
-          className="absolute xl:top-35 top-35 xl:left-25 left-3 w-10 xl:w-48 z-20 pointer-events-none hoja-animation1 "
-          style={{ transform: "rotate(70deg)" }} 
-        />
-        <img 
-          src="/imgs/home/hoja.webp" 
-          alt="Rana de ojos rojos" 
-          className="absolute xl:top-0 top-40 xl:left-20 left-3 w-10 xl:w-48 z-20 pointer-events-none hoja-animation2 "
-          style={{ transform: "rotate(60deg)" }} 
-        />
+      <img
+        src="/imgs/home/frog.webp"
+        alt="Rana de ojos rojos"
+        className="absolute xl:top-58 top-33 xl:left-64 left-0 w-20 xl:w-48 z-20 pointer-events-none"
+        loading="lazy"
+        decoding="async"
+      />
+      <img
+        src="/imgs/home/hoja.webp"
+        alt="Hoja tropical"
+        className="absolute xl:top-35 top-35 xl:left-25 left-3 w-10 xl:w-48 z-20 pointer-events-none hoja-animation1"
+        style={{ transform: "rotate(70deg)" }}
+        loading="lazy"
+        decoding="async"
+      />
+      <img
+        src="/imgs/home/hoja.webp"
+        alt="Hoja tropical"
+        className="absolute xl:top-0 top-40 xl:left-20 left-3 w-10 xl:w-48 z-20 pointer-events-none hoja-animation2"
+        style={{ transform: "rotate(60deg)" }}
+        loading="lazy"
+        decoding="async"
+      />
 
       <AnimatePresence>
         {selectedFeature && (
@@ -354,7 +351,7 @@ const features: Feature[] = [
                 <div className="lg:w-1/2 relative">
                   <div className="aspect-[4/3] w-full">
                     <img
-                      src={selectedFeature.images[0]} 
+                      src={selectedFeature.images[0]}
                       alt={selectedFeature.title}
                       className="absolute inset-0 w-full h-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none shadow-lg"
                       loading="lazy"
@@ -367,9 +364,7 @@ const features: Feature[] = [
                   <h3 className="text-3xl font-bold mb-4 font-cinzel text-white">
                     {selectedFeature.title}
                   </h3>
-                  <p className="text-slate-100 text-lg mb-6">
-                    {selectedFeature.description}
-                  </p>
+                  <p className="text-slate-100 text-lg mb-6">{selectedFeature.description}</p>
 
                   <div className="space-y-4">
                     {selectedFeature.details.map((key) => (
@@ -389,7 +384,8 @@ const features: Feature[] = [
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#4B2A1F] to-transparent pointer-events-none"></div>
+
+      <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#4B2A1F] to-transparent pointer-events-none" />
     </section>
   );
 }

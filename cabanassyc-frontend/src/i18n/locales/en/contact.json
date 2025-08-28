@@ -1,38 +1,55 @@
 {
-    "title": "Contact Us",
-    "cardTitle": "Send us your details and we'll contact you",
-    "firstname": "Your firstname",
-    "inputFirstname": "Please enter your firstname",
-    "lastname": "Your lastname",
-    "inputLastname": "Please enter your lastname",
-    "email": "Your email", 
-    "inputEmail": "Please enter your email",
-    "phone": "Your phone",
-    "inputPhone": "Please enter your phone",
-    "subject": "Subject",
-    "inputSubject": "Select subject",
-    "message": "Messsage",
-    "inputMessage": "Write your message here",
-    "button": "Send",
-    "validation": {
-        "emptyFirstname": "Please enter your firstname",
-        "emptyLastname": "Please enter your lastname",
-        "invalidEmail": "Please enter a valid email",
-        "invalidPhone": "Please enter a valid phone",
-        "emptyMessage": "Please enter your message",
-        "formSuccess": "Message sent succesfully!",
-        "formError": "Error sending message: "
-    },
-    "activities": {
-        "title": "Activities to do in La Fortuna"
-    },
-    "restaurants": {
-        "title": "Restaurants"
-    },
-    "airports": {
-        "title": "Airports",
-        "juanSantaMaria": "Juan Santa María Airport",
-        "fortuna": "La Fortuna Airport",
-        "sanCristobal": "San Cristobal Airport"
-    }
+  "title": "Contact us",
+  "cardTitle": "Send us your details and we will get back to you",
+  "firstname": "First name",
+  "inputFirstname": "Please enter your first name",
+  "lastname": "Last name",
+  "inputLastname": "Please enter your last name",
+  "email": "Email",
+  "inputEmail": "Please enter your email",
+  "phone": "Phone",
+  "inputPhone": "Please enter your phone number",
+  "subject": "Subject",
+  "inputSubject": "Select a subject",
+  "message": "Message",
+  "inputMessage": "Write your message here",
+  "button": "Send",
+  "validation": {
+    "emptyFirstname": "Please enter your first name",
+    "emptyLastname": "Please enter your last name",
+    "invalidEmail": "Please enter a valid email",
+    "invalidPhone": "Please enter a valid phone number",
+    "emptyMessage": "Please enter your message",
+    "formSuccess": "Message sent successfully!",
+    "formError": "Error sending the message: "
+  },
+  "activities": {
+    "title": "Things to do in La Fortuna",
+    "items": [
+      { "name": "Arenal Ecoglide Park", "distance": "4.1 km" },
+      { "name": "La Fortuna Central Park", "distance": "3.8 km" },
+      { "name": "Arenal Volcano National Park", "distance": "17.7 km" },
+      { "name": "Arenal Ecological Park", "distance": "10.5 km" },
+      { "name": "Sky Adventures", "distance": "21.3 km" },
+      { "name": "Lake Arenal", "distance": "17.7 km" },
+      { "name": "Místico Park", "distance": "2.3 km" },
+      { "name": "Río Celeste", "distance": "66.6 km" },
+      { "name": "Sloth Park", "distance": "2.8 km" }
+    ]
+  },
+  "restaurants": {
+    "title": "Restaurants"
+  },
+  "airports": {
+    "title": "Airports",
+    "juanSantaMaria": "Juan Santamaría International Airport",
+    "fortuna": "La Fortuna Airstrip",
+    "guanacaste": "Guanacaste Airport"
+  },
+  "actions": {
+    "viewOnMap": "Open in Google Maps",
+    "copyName": "Copy name",
+    "copied": "Copied!",
+    "close": "Close"
+  }
 }

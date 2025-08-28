@@ -51,7 +51,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+            .requestMatchers(HttpMethod.GET, "/tours").permitAll()
             .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+            .requestMatchers(HttpMethod.GET, "/cabins/details").permitAll()
+            .requestMatchers(HttpMethod.POST, "/contacts").permitAll()
                .anyRequest().authenticated()
                )
             .oauth2Login(oauth2 -> oauth2.successHandler(googleOAuth2SuccessHandler))

@@ -17,7 +17,7 @@
     "facilitiesTitle": "Facilities",
     "facilitiesSubtitle": "Pool, ranch, and relaxing common areas",
     "toursTitle": "Tours",
-    "toursSubtitle": "Explore waterfalls, volcanoes, and more",
+    "toursSubtitle": "Explore waterfalls, volcano, and more",
     "roomsTitle": "Rooms",
     "roomsSubtitle": "Rustic cabins equipped with all comforts"
   },
@@ -36,8 +36,9 @@
       "scheduleTitle": "Schedule",
       "extrasTitle": "Extras",
       "sizeData": "15m x 8m",
-      "depthData": "1.2m - 2.5m",
-      "scheduleData": "8:00am to 8:00pm"
+      "depthData": "0.80m - 1.50m",
+      "scheduleData": "8:00am to 8:00pm",
+      "extrasData": "Chairs and tables for your comfort"
     },
     "volcanoDetails": {
       "timeTitle": "Best time",
@@ -45,7 +46,7 @@
       "extrasTitle": "Extras",
       "timeData": "Sunrise and sunset",
       "viewPointData": "Pool",
-      "extrasData": "Available telescopes, geological information"
+      "extrasData": "Binoculars"
     },
     "kitchenDetails": {
       "capacityTitle": "Capacity",
@@ -53,7 +54,7 @@
       "amenitiesTitle": "Amenities",
       "capacityData": "Up to 20 people",
       "equipmentData": "Full kitchen, grill, refrigerator",
-      "amenitiesData": "Picnic tables, hammocks, playground"
+      "amenitiesData": "BBQ area, tables and chairs to share"
     }
   }
 }

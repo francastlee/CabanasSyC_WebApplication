@@ -42,12 +42,14 @@ const UserDropdown = () => {
                   {user.name}
                 </div>
               )}
-              <Link
+              {user?.role != "USER" && user?.role && (
+                <Link
                 to="/profile"
                 className="block px-4 py-2 text-sm text-white hover:bg-[#856D5D]"
               >
                 {t('client.profile')}
               </Link>
+              )}
               <button
                 onClick={logout}
                 className="w-full text-left px-4 py-2 text-sm text-white cursor-pointer hover:bg-[#856D5D]"

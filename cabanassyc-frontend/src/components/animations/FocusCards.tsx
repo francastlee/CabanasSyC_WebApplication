@@ -4,6 +4,7 @@ import { cn } from "../../utils/Utils";
 import AnimatedContent from "./AnimatedContent";
 import type { CardType } from "../home/Types";
 import { debounce } from "../../utils/Debounce";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface CardProps {
   card: CardType;
@@ -36,25 +37,42 @@ const CardOverlay = ({ hovered, card }: { hovered: boolean; card: CardType }) =>
 );
 
 const Card = React.memo(({ card, index, hovered, setHovered, isMobile }: CardProps) => {
-  const handleInteraction = () => {
-    if (isMobile) {
-      setHovered(index === hovered ? null : index);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const handleClick = () => {
+    if (!card?.href) return;
+
+    if (card.href.includes("#")) {
+      const [path, hash] = card.href.split("#");
+      const targetPath = path || pathname;
+
+      if (pathname === targetPath && hash) {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+      }
     }
+
+    navigate(card.href);
   };
 
   return (
     <div
       onMouseEnter={() => !isMobile && setHovered(index)}
       onMouseLeave={() => !isMobile && setHovered(null)}
-      onClick={handleInteraction}
+      onClick={handleClick}
+      onKeyDown={(e) => e.key === "Enter" && handleClick()}
       className={cn(
         "relative rounded-lg bg-gray-100 dark:bg-neutral-900 overflow-hidden",
         "h-[35vh] lg:h-[60vh] w-full",
         "transition-all duration-300 ease-out cursor-pointer",
         hovered !== null && hovered !== index && "blur-sm scale-[0.90]"
       )}
-      aria-label={`Ver detalles de ${card.title}`}
-      role="button"
+      aria-label={`Open ${card.title}`}
+      role="link"
       tabIndex={0}
     >
       <img
@@ -68,7 +86,6 @@ const Card = React.memo(({ card, index, hovered, setHovered, isMobile }: CardPro
     </div>
   );
 });
-
 Card.displayName = "Card";
 
 const animationProps = {
@@ -89,29 +106,25 @@ export function FocusCards({ cards }: { cards: CardType[] }) {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     const handleResize = debounce(checkMobile, 200);
-    
     checkMobile();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <div 
+    <div
       className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-10 max-w-[75%] mx-auto px-4"
-      role="region" 
-      aria-label="Galería de servicios"
+      role="region"
+      aria-label="Services gallery"
     >
       {cards.map((card, index) => (
-        <AnimatedContent 
-          key={`${card.title}-${index}`} 
-          {...animationProps}
-        >
-          <Card 
-            card={card} 
-            index={index} 
-            hovered={hovered} 
-            setHovered={setHovered} 
-            isMobile={isMobile} 
+        <AnimatedContent key={card.src} {...animationProps}>
+          <Card
+            card={card}
+            index={index}
+            hovered={hovered}
+            setHovered={setHovered}
+            isMobile={isMobile}
           />
         </AnimatedContent>
       ))}

@@ -2,7 +2,6 @@ package com.castleedev.cabanassyc_backend.Services.Implementations;
 
 import java.util.List;
 
-import javax.management.relation.RoleNotFoundException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -106,6 +105,7 @@ public class UserService implements IUserService {
         UserModel user = convertToEntity(userDTO);
         user.setPasswordHashed(passwordEncoder.encode(userDTO.getPassword()));
         user.setState(true);
+        user.setHourlyRate(0);
         UserModel savedUser = userDAL.save(user);
         
         return convertToDTO(savedUser);
@@ -161,7 +161,6 @@ public class UserService implements IUserService {
     public UserModel upsertGoogleUser(String email, String name, String pictureUrl) {
         UserModel user = userDAL.findByEmailAndStateTrue(email)
             .map(existing -> {
-                // opcional: sincronizar nombre
                 if (name != null && !name.isEmpty()) {
                     String[] parts = name.split(" ", 2);
                     existing.setFirstName(parts[0]);
@@ -170,7 +169,6 @@ public class UserService implements IUserService {
                 return userDAL.save(existing);
             })
             .orElseGet(() -> {
-                // crear usuario nuevo sin password (OAuth2)
                 UserModel u = new UserModel();
                 if (name != null && !name.isEmpty()) {
                     String[] parts = name.split(" ", 2);
@@ -178,12 +176,11 @@ public class UserService implements IUserService {
                     if (parts.length > 1) u.setLastName(parts[1]);
                 }
                 u.setEmail(email);
-                u.setPasswordHashed(""); // sin password local
+                u.setPasswordHashed("");
                 u.setState(true);
                 return userDAL.save(u);
             });
 
-        // 📌 Asignar rol USER si no lo tiene
         boolean hasUserRole = user.getUserRolList() != null && 
                             user.getUserRolList().stream()
                                 .anyMatch(ur -> "USER".equalsIgnoreCase(ur.getRol().getName()));
@@ -201,14 +198,5 @@ public class UserService implements IUserService {
         }
 
         return user;
-    }
-
-    private void updatePasswordIfChanged(UserModel newUser, UserModel existingUser) {
-        if (newUser.getPasswordHashed() != null && 
-            !passwordEncoder.matches(newUser.getPasswordHashed(), existingUser.getPasswordHashed())) {
-            newUser.setPasswordHashed(passwordEncoder.encode(newUser.getPasswordHashed()));
-        } else {
-            newUser.setPasswordHashed(existingUser.getPasswordHashed());
-        }
     }
 }

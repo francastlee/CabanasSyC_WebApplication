@@ -15,35 +15,38 @@ const DiscoverMoreSection = ({ cards: propCards }: DiscoverMoreSectionProps) => 
     {
       title: t("discoverMore.facilitiesTitle"),
       subtitle: t("discoverMore.facilitiesSubtitle"),
-      src: "/imgs/home/facilities.jpg",
+      src: "/imgs/home/facilities.webp",
+      href: "/home#facilities",
     },
     {
       title: t("discoverMore.toursTitle"),
       subtitle: t("discoverMore.toursSubtitle"),
-      src: "/imgs/home/tours.jpg",
+      src: "/imgs/home/tours.webp",
+      href: "/tours",
     },
     {
       title: t("discoverMore.roomsTitle"),
       subtitle: t("discoverMore.roomsSubtitle"),
       src: "/imgs/home/cabin2.webp",
+      href: "/cabins",
     },
   ];
 
   const cards = propCards || defaultCards;
 
   return (
-    <section 
+    <section
       className="bg-[#4B2A1F] w-full relative overflow-hidden h-[150vh] xl:h-screen select-none"
       aria-labelledby="discover-more-title"
     >
-      <div 
+      <div
         className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#1a3a17] to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
       <StarsBackground starCount={100} />
-      
+
       <div className="container mx-auto px-4 relative z-20">
-        <h2 
+        <h2
           id="discover-more-title"
           className="text-4xl md:text-5xl lg:text-6xl text-white text-center mb-12 font-cinzel text-glow-green mt-12"
         >

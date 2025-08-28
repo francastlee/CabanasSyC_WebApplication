@@ -1,29 +1,43 @@
 "use client";
+import { useMemo, memo } from "react";
+
 interface StarsBackgroundProps {
   starCount?: number;
 }
 
-export const StarsBackground = ({ starCount = 100 }: StarsBackgroundProps) => (
-  <div 
-    className="hidden lg:block stars z-0 absolute inset-0 h-full pointer-events-none overflow-hidden"
-    aria-hidden="true"
-  >
-    {Array.from({ length: starCount }).map((_, i) => {
+export const StarsBackground = memo(({ starCount = 100 }: StarsBackgroundProps) => {
+  const stars = useMemo(() => {
+    return Array.from({ length: starCount }).map(() => {
       const size = Math.random() * 2 + 1;
-      return (
+      return {
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        size,
+        delay: `${Math.random() * 6}s`,
+        opacity: Math.random() * 0.5 + 0.3,
+      };
+    });
+  }, [starCount]);
+
+  return (
+    <div
+      className="hidden lg:block stars z-0 absolute inset-0 h-full pointer-events-none overflow-hidden"
+      aria-hidden="true"
+    >
+      {stars.map((s, i) => (
         <div
-          key={`star-${i}`}
+          key={i}
           className="absolute rounded-full bg-white animate-pulse"
           style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            width: `${size}px`,
-            height: `${size}px`,
-            animationDelay: `${Math.random() * 6}s`,
-            opacity: Math.random() * 0.5 + 0.3,
+            top: s.top,
+            left: s.left,
+            width: `${s.size}px`,
+            height: `${s.size}px`,
+            animationDelay: s.delay,
+            opacity: s.opacity,
           }}
         />
-      );
-    })}
-  </div>
-);
+      ))}
+    </div>
+  );
+});
