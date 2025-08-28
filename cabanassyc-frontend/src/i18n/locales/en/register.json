@@ -1,0 +1,33 @@
+{
+  "title": "Create account",
+  "subtitle": "Join our family",
+  "placeholders": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password"
+  },
+  "buttons": {
+    "signUp": "Sign up"
+  },
+  "or": "or",
+  "alreadyHaveAccount": "Already have an account?",
+  "goToLogin": "Go to login",
+  "messages": {
+    "registerSuccess": "Registration successful. You can now sign in!",
+    "registerError": "Registration failed.",
+    "fixErrors": "Please fix the form errors."
+  },
+  "errors": {
+    "firstName": "First name must be at least 2 characters.",
+    "lastName": "Last name must be at least 2 characters.",
+    "email": "Invalid email address.",
+    "password": "Password must be at least 4 characters.",
+    "confirmPassword": "Passwords do not match."
+  },
+  "aria": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  }
+}

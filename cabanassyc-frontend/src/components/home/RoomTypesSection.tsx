@@ -10,8 +10,8 @@ const RoomTypesSection = () => {
   return (
     <section className="relative bg-[#1a3a17] min-h-screen overflow-hidden flex flex-col justify-center items-center w-full px-4 md:px-8 select-none">
       <div className="absolute bottom-0 left-0 w-full h-32 md:h-40 bg-gradient-to-t from-[#4B2A1F] to-transparent pointer-events-none z-20"></div>
-      <CinematicImage src="/imgs/home/slothTree.png" variant="sloth" />
-      <CinematicImage src="/imgs/home/nature.png" variant="nature" />
+      <CinematicImage src="/imgs/home/slothTree.webp" variant="sloth" />
+      <CinematicImage src="/imgs/home/nature.webp" variant="nature" />
 
       
       <div className="relative z-10 flex flex-col items-center w-full max-w-7xl mx-auto">
@@ -50,7 +50,7 @@ const RoomTypesSection = () => {
             <CabinCard
               title={t("roomTypes.subtitleDobleRoom")}
               description={t("roomTypes.descriptionDobleRoom")}
-              imageUrl="/imgs/home/cabin2.webp"
+              imageUrl="/imgs/home/cabinsNight.webp"
             />
           </AnimatedContent>
         </div>

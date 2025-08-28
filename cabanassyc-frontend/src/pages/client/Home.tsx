@@ -1,3 +1,4 @@
+import ScrollToHash from "../../components/common/ScrollToHash";
 import DiscoverMoreSection from "../../components/home/DiscoverMoreSection";
 import FacilitiesSection from "../../components/home/FacilitiesSection";
 import { HeroSection } from "../../components/home/HeroSection";
@@ -7,6 +8,7 @@ import Footer from "../../layouts/Footer";
 const Home = () => {
   return (
     <>
+      <ScrollToHash offset={0} />
       <section className="relative min-h-screen w-full overflow-hidden">
         <img
           src="/imgs/home/homeBackground.webp"

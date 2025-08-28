@@ -1,0 +1,13 @@
+{
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe o ha sido movida.",
+    "goHome": "Ir al inicio",
+    "contact": "Contáctanos"
+  },
+  "noAuthorized": {
+    "title": "Acceso denegado",
+    "description": "No tienes permiso para ver {{page}}.",
+    "goHome": "Ir al inicio"
+  }
+}

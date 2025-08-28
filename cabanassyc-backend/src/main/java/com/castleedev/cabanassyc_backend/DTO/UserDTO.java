@@ -1,5 +1,6 @@
 package com.castleedev.cabanassyc_backend.DTO;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -30,6 +31,7 @@ public class UserDTO {
     private String password;
     
     @PositiveOrZero(message = "Tarifa por hora debe ser positiva")
+    @Nullable
     private Double hourlyRate;
     
     private Boolean state;

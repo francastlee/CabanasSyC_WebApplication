@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import SplitText from "../../components/animations/SplitText";
 import LanguageSwitcher from "../../components/navbar/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const { t } = useTranslation("login");
@@ -100,7 +101,7 @@ const Login = () => {
   return (
     <section
       className="flex justify-center items-center w-full min-h-screen bg-cover bg-center p-6 sm:p-8 animate-[swayBackground_5s_ease-in]"
-      style={{ backgroundImage: "url('/imgs/login/bglogin.jpg')" }}
+      style={{ backgroundImage: "url('/imgs/login/bglogin.webp')" }}
     >
       <div className="absolute top-5 right-20 z-50">
         <LanguageSwitcher />
@@ -210,9 +211,12 @@ const Login = () => {
           </button>
         </div>
 
-        <span className="text-white mt-8 text-xs hover:text-[#B28B09] cursor-pointer select-none">
+        <Link
+          to="/register"
+          className="text-white mt-8 text-xs hover:text-[#B28B09] cursor-pointer select-none"
+        >
           {t("noAccount")}
-        </span>
+        </Link>
       </div>
     </section>
   );

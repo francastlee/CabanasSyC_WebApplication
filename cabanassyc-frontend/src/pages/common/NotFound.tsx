@@ -1,0 +1,32 @@
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+export default function NotFound() {
+  const { t } = useTranslation("errors");
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-[#4B2A1F] shadow-lg rounded-xl p-8 text-center">
+        <h1 className="text-5xl font-bold text-gray-400 mb-2">404</h1>
+        <h2 className="text-2xl font-semibold mb-3 text-white">
+          {t("notFound.title")}
+        </h2>
+        <p className="text-gray-400 mb-6">{t("notFound.description")}</p>
+        <div className="flex gap-3 justify-center">
+          <Link
+            to="/home"
+            className="px-4 py-2 rounded-lg bg-[#1a3a17] text-white hover:opacity-90"
+          >
+            {t("notFound.goHome")}
+          </Link>
+          <Link
+            to="/contact"
+            className="px-4 py-2 rounded-lg bg-[#1a3a17] text-white"
+          >
+            {t("notFound.contact")}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

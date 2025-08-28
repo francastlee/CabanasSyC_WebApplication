@@ -17,7 +17,7 @@
     "facilitiesTitle": "Zonas comunes",
     "facilitiesSubtitle": "Piscina, rancho y espacios para relajarte",
     "toursTitle": "Tours guiados",
-    "toursSubtitle": "Explorá cataratas, volcanes y más",
+    "toursSubtitle": "Explorá cataratas, volcan y más",
     "roomsTitle": "Cabañas",
     "roomsSubtitle": "Cabañas rústicas con todas las comodidades"
   },
@@ -36,8 +36,9 @@
       "scheduleTitle": "Horario",
       "extrasTitle": "Extras",
       "sizeData": "15m x 8m",
-      "depthData": "1.2m - 2.5m",
-      "scheduleData": "8:00am a 8:00pm"
+      "depthData": "0.80m - 1.50m",
+      "scheduleData": "8:00am a 8:00pm",
+      "extrasData": "Mesas y sillas para tu comodidad"
     },
     "volcanoDetails": {
       "timeTitle": "Mejor momento",
@@ -45,7 +46,7 @@
       "extrasTitle": "Extras",
       "timeData": "Amanecer y atardecer",
       "viewPointData": "Piscina",
-      "extrasData": "Telescopios disponibles, información geológica"
+      "extrasData": "Binoculares"
     },
     "kitchenDetails": {
       "capacityTitle": "Capacidad",
@@ -53,7 +54,7 @@
       "amenitiesTitle": "Facilidades",
       "capacityData": "Hasta 20 personas",
       "equipmentData": "Cocina completa, parrilla y refrigerador",
-      "amenitiesData": "Mesas de picnic, hamacas, zona de juegos"
+      "amenitiesData": "Área de BBQ, mesas y sillas para compartir"
     }
   }
 }

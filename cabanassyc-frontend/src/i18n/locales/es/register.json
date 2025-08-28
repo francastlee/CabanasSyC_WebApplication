@@ -1,0 +1,33 @@
+{
+  "title": "Crear cuenta",
+  "subtitle": "Únete a nuestra familia",
+  "placeholders": {
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña"
+  },
+  "buttons": {
+    "signUp": "Registrarme"
+  },
+  "or": "o",
+  "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+  "goToLogin": "Ir al inicio de sesión",
+  "messages": {
+    "registerSuccess": "Registro exitoso. ¡Ahora puedes iniciar sesión!",
+    "registerError": "No se pudo completar el registro.",
+    "fixErrors": "Por favor corrige los errores del formulario."
+  },
+  "errors": {
+    "firstName": "El nombre debe tener al menos 2 caracteres.",
+    "lastName": "Los apellidos deben tener al menos 2 caracteres.",
+    "email": "Correo no válido.",
+    "password": "La contraseña debe tener al menos 4 caracteres.",
+    "confirmPassword": "Las contraseñas no coinciden."
+  },
+  "aria": {
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
+  }
+}

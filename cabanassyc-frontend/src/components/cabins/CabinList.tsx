@@ -31,16 +31,15 @@ export default function CabinList() {
       <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-[#4B2A1F] to-transparent pointer-events-none z-10" />
 
         <img
-          src="imgs/cabins/colibri.png"
+          src="imgs/cabins/Colibri.webp"
           className="absolute w-1/2 sm:w-[30%] md:w-[28%] top-20 left-0 colibri-mask colibri-animation z-10"
           alt="Colibrí"
         />
         <img
-          src="imgs/cabins/tucan.png"
+          src="imgs/cabins/tucan.webp"
           className="absolute w-60 sm:w-[30%] md:w-[28%] top-20 lg:top-auto lg:bottom-5 right-0 tucan-mask tucan-animation z-10"
           alt="Tucán"
         />
-
 
         <h2 className="text-white text-4xl sm:text-5xl md:text-6xl font-cinzel text-center mt-25 mb-15 text-glow-brown z-20 relative">
           {t("cabins.title")}

@@ -2,6 +2,7 @@ export interface CardType {
   title: string;
   subtitle?: string;
   src: string;
+  href?: string;
 }
 
 export interface AnimationProps {
