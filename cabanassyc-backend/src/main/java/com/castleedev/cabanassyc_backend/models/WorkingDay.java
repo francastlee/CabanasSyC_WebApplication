@@ -34,6 +34,7 @@ public class WorkingDay {
     private LocalDate date;
     private Time checkInTime;
     private Time checkOutTime;
+    private Double revenue;
     private boolean state;
     
 }

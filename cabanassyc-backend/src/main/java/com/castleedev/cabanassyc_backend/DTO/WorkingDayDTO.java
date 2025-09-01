@@ -29,6 +29,8 @@ public class WorkingDayDTO {
     private Time checkInTime;
     
     private Time checkOutTime;
+
+    private Double revenue;
     
     private boolean state;
 }

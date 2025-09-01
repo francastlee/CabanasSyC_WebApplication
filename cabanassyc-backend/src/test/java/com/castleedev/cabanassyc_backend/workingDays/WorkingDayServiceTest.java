@@ -60,6 +60,7 @@ class WorkingDayServiceTest {
             LocalDate.now(), 
             Time.valueOf("09:00:00"), 
             Time.valueOf("17:00:00"), 
+            2.00,
             true
         );
         
@@ -69,6 +70,7 @@ class WorkingDayServiceTest {
             LocalDate.now(), 
             Time.valueOf("09:00:00"), 
             Time.valueOf("17:00:00"), 
+            2.00,
             true
         );
     }
@@ -121,6 +123,7 @@ class WorkingDayServiceTest {
             LocalDate.of(2023, 1, 2),
             Time.valueOf("10:00:00"), 
             Time.valueOf("18:00:00"), 
+            2.00,
             true
         );
         when(workingDayDAL.findByIdAndStateTrue(99L)).thenReturn(Optional.empty());
