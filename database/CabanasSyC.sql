@@ -112,6 +112,7 @@ CREATE TABLE workingDay (
     date DATE NOT NULL,
     checkInTime TIME NOT NULL,
     checkOutTime TIME NOT NULL,
+    revenue DOUBLE PRECISION NOT NULL,
     state BOOLEAN NOT NULL
 );
 
@@ -126,3 +127,18 @@ CREATE TABLE contact (
     read BOOLEAN NOT NULL,
     state BOOLEAN NOT NULL
 );
+
+CREATE TABLE task (
+    taskId BIGSERIAL PRIMARY KEY,
+    taskDescription TEXT NOT NULL,
+    assignedTo BIGINT REFERENCES users(userId) ON DELETE SET NULL,
+    createdBy BIGINT REFERENCES users(userId) ON DELETE SET NULL,
+    cabinId BIGINT REFERENCES cabin(cabinId) ON DELETE SET NULL,
+    isFinished BOOLEAN NOT NULL DEFAULT FALSE,
+    taskDate DATE NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE INDEX idx_task_assignedTo ON task (assignedTo);
+CREATE INDEX idx_task_relatedCabin ON task (cabinId);
+CREATE INDEX idx_task_taskDate ON task (taskDate);
