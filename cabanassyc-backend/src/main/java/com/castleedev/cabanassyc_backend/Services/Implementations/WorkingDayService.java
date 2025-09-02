@@ -126,6 +126,7 @@ public class WorkingDayService implements IWorkingDayService {
             workingDay.getDate(),
             workingDay.getCheckInTime(),
             workingDay.getCheckOutTime(),
+            workingDay.getRevenue(),
             workingDay.isState()
         );
     }
@@ -145,6 +146,7 @@ public class WorkingDayService implements IWorkingDayService {
             workingDayDTO.getDate(),
             workingDayDTO.getCheckInTime(),
             workingDayDTO.getCheckOutTime(),
+            workingDayDTO.getRevenue(),
             workingDayDTO.isState()
         );
     }
