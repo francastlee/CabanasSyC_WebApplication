@@ -66,11 +66,11 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskDTO updateTask(TaskDTO dto) {
-        if (dto.getTaskId() == null) {
+        if (dto.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task id is required for update");
         }
 
-        Task existing = taskDAL.findByIdAndStateTrue(dto.getTaskId())
+        Task existing = taskDAL.findByIdAndStateTrue(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
         UserModel assignedTo = findUserIfPresent(dto.getAssignedToId());
@@ -145,7 +145,7 @@ public class TaskService implements ITaskService {
 
     private TaskDTO convertToDTO(Task task) {
         return new TaskDTO(
-                task.getTaskId(),
+                task.getId(),
                 task.getTaskDescription(),
                 task.getAssignedTo() != null ? task.getAssignedTo().getId() : null,
                 task.getCreatedBy() != null ? task.getCreatedBy().getId() : null,
@@ -158,7 +158,7 @@ public class TaskService implements ITaskService {
 
     private Task convertToEntity(TaskDTO dto, UserModel assignedTo, UserModel createdBy, Cabin cabin) {
         Task task = new Task();
-        task.setTaskId(dto.getTaskId());
+        task.setId(dto.getId());
         task.setTaskDescription(dto.getTaskDescription());
         task.setAssignedTo(assignedTo);
         task.setCreatedBy(createdBy);

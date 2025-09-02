@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TaskDTO {
 
-    private Long taskId;
+    private Long id;
 
     @NotBlank(message = "Task description is required")
     @Size(min = 5, max = 500, message = "Task description must be between 5 and 500 characters")
